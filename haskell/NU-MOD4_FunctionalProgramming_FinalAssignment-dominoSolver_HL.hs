@@ -9,17 +9,13 @@
 type Position = (Int, Int) -- (x,y) position on the grid, with origin in left upper corner
 
 type Bone = (Int, Int) -- Bone with corresponding number of pips on the bone, identified by its number = index in bones (see helper functions)
--- type Bone = (Int, (Int, Int)) -- bone identified by its number, with corresponding number of pips on the bone
-type PlacedBone = ((Position, Position), Int) -- bone spanning two positions, and its number
+type PlacedBone = ((Position, Position), Int) -- bone spanning two positions, and its number -- PM: may also be placed in array with index position/number?
 
 type PipGrid = [Int] -- the input, with number of pips per position, corresponding with positions (see helper functions)
 type BoneGrid = [Int] -- the output(s), with bone number per position, , corresponding with positions (see helper functions)
 
--- -- type Grid = [Int] -- maybe combine the two below into this one
--- type PipGrid = [(Position, Int)] -- 
--- type BoneGrid = [(Position, Int)] -- this is the output, with bone number per position
 
--- Setting of the solver --
+-- Settings of the solver --
 -- Board dimensions:
 width :: Int -- width of the board (x-direction)
 width = 8 
@@ -27,8 +23,8 @@ width = 8
 height :: Int -- height of the board (y-direction)
 height = 7 
 
--- Setting the constraints -- 
 
+-- Setting the constraints -- 
 valid :: Position -> Position -> Bone -> Bool
 valid p1 p2 b == validOnBoard p1 && validOnBoard p2 && validOnFree p1 && validOnFree p2 && validPipMatch p1 p2 b && validNotUsed b
 
@@ -51,7 +47,7 @@ validNotUsed b = undefined
 -- should check if bone is already used: how?!
 
 
-
+-- Solving the problem -- 
 solve :: PipGrid -> [BoneGrid]
 solve = undefined
 -- CheckOrientaties voor positie (x,y) 
@@ -63,6 +59,7 @@ solve = undefined
 --   Zonee:  = oplossing|iets doms 
 -- !! PM: orientation can also be "reversed" horizontal/vertical, because not all bones are symmetric
 -- misschien met een variable bord die in recursie steeds kleiner wordt als posities gevuld? Dan ook dat probleem ondervangen
+
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -83,7 +80,6 @@ examplePipGrid1 = [6, 6, 2, 6, 5, 2, 4, 1,
                    6, 0, 5, 3, 4, 2, 0, 3]
 
 
-
 -- Helper functions --
 positions :: [Position] -- generates list of positions, ..  to map pips or bones on
 positions = [(x,y) | y <- [0..height], x <- [0..width]]
@@ -98,18 +94,15 @@ generateBones n = generateSerie n ++ generateBones (n+1)
     where generateSerie n = [(n,y) | y <- [n..6]]
 
 
--- userInput = 
+-- parseUserInput = ...
 
--- data Move = Left | Right | Up | Down
-
+-- data Move = Left | Right | Up | Down -- note: Right is already defined in Data.Either
 -- move :: Move -> Position -> Position
 -- move Left (x, y) = (x 1, y)
 -- move Right (x, y) = (x + 1, y)
 -- move Up (x, y) = (x, y 1)
 -- move Down (x, y) = (x, y + 1)
 
--- printGrid :: Grid -> IO ()
+-- printGrid :: Grid -> IO () -- NEEDS WORK
 -- printGrid ns = putStr [n ,n <- ns] 
-    
--- putStr(
 --     where printRowHorz g y = [g!!i | x <-[0..WIDTH] ] ++ ['/n]
