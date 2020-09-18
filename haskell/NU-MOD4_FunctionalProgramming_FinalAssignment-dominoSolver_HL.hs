@@ -45,6 +45,7 @@ validPipMatch p p b = undefined
 validNotUsed :: Bone -> Bool
 validNotUsed b = undefined
 -- should check if bone is already used: how?!
+-- solution append to array, then check if in array
 
 
 -- Solving the problem -- 
