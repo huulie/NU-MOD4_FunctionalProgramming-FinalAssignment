@@ -4,9 +4,10 @@
 --        Nedap University [5] - September 2020        --
 --              Written by Huub Lievestro              --
 
+import Data.List -- Needed for findIndex
 
 -- Definition of types, to descrive the problem -- 
-type Position = (Int, Int) -- (x,y) position on the grid, with origin in left upper corner
+type Position = (Int, Int) -- (x,y) position on the grid, with origin (0,0) in left upper corner
 
 type Bone = (Int, Int) -- Bone with corresponding number of pips on the bone, identified by its number = index in bones (see helper functions)
 type PlacedBone = ((Position, Position), Int) -- bone spanning two positions, and its number -- PM: may also be placed in array with index position/number?
@@ -25,8 +26,8 @@ height = 7
 
 
 -- Setting the constraints for options to be valid -- 
-valid :: (Position,Position) -> (Int,Int) -> [Position] -> Bone -> [Bones] -> Bool
-valid (p1,p2) (n1,n2) ps b bs == validOnBoard p1 && validOnBoard p2 && validOnFree p1 ps && validOnFree p2 ps && validPipMatch n1 n2 b && validNotUsed b bs
+valid :: (Position,Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> Bool
+valid (p1,p2) ps pg b bs = validOnBoard p1 && validOnBoard p2 && validOnFree p1 ps && validOnFree p2 ps && validPipMatch (position2pip p1 pg) (position2pip p2 pg) b && validNotUsed b bs
 
 validOnBoard :: Position -> Bool -- checks if x- and y-coordinate of a position are within bounds of the board
 validOnBoard (x,y) | xValid x && yValid y = True
@@ -34,15 +35,15 @@ validOnBoard (x,y) | xValid x && yValid y = True
     where xValid x = x >= 0 && x < width
           yValid y = y >= 0 && y < height
 
-validOnFree :: Position -> [Positions] -> Bool -- checks if Position is in list of available Positions
+validOnFree :: Position -> [Position] -> Bool -- checks if Position is in list of available Positions
 validOnFree p ps | elem p ps = True
                  | otherwise = False
 
-validPipMatch :: Position -> Position -> Bone -> Bool -- checks if pip at first position matches first pip of bone, same for second pip
+validPipMatch :: Int -> Int -> Bone -> Bool -- checks if pip at first position matches first pip of bone, same for second pip
 validPipMatch n1 n2 (nl,nr) | n1 == nl && n2 == nr = True
                             | otherwise = False 
 
-validNotUsed :: Bone -> [Bones] -> Bool -- checks if Bone is in list of available Bones
+validNotUsed :: Bone -> [Bone] -> Bool -- checks if Bone is in list of available Bones
 validNotUsed b bs | elem b bs = True
                   | otherwise = False
  -- every time calling function recursively, also provide argument with remaining bones (every step should have information to do its job)
@@ -70,15 +71,15 @@ solve = undefined
 
 -- next position is head ps
 
-nextStepHorizontal :: Position -> [Positions] -> [Bones] -- for each bone taken from all remaining bones 
-nextStepHorizontal p n1 n2 ps bs = [checkHorizontal (orientation Horizontal p) (n1,n2) ps b bs | b <- bs] -- eventually shiftX and shiftY from generators?!
+nextStepHorizontal :: Position -> [Position] -> PipGrid -> [Bone] -> a -- for each bone taken from all remaining bones 
+nextStepHorizontal p ps pg bs = undefined -- [checkHorizontal (orientation Horizontal p) ps pg b bs | b <- bs] -- eventually shiftX and shiftY from generators?!
 
 -- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
 -- checkHorizontal :: PipGrid -> (Position, Position) -> [Positions] -> [Bones] -> BoneGrid
-checkHorizontal :: (Position, Position) -> (Int, Int) -> [Position] -> Bone -> [Bone] -> BoneGrid
-checkHorizontal (p1,p2) (n1,n2) ps b bs | valid (p1,p2) (n1,n2) ps b bs = undefined -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
-                                        | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
-                                        | otherwise = undefined -- end recursion, not all bones placed = nonesense
+checkHorizontal :: (Position, Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> b-- -> BoneGrid
+checkHorizontal (p1,p2) ps pg b bs | valid (p1,p2) ps pg b bs = undefined -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
+                                   | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
+                                   | otherwise = undefined -- end recursion, not all bones placed = nonesense
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -119,15 +120,25 @@ orientation Vertical      (x,y) = ((x,y),(x,y+1))
 orientation InvHorizontal (x,y) = ((x+1,y),(x,y))
 orientation InvVertical   (x,y) = ((x,y+1),(x,y))
 
+position2index :: Position -> Int -- Only if nothing was removed from the list!
+position2index (x,y) = (y * width + x)
+
+position2index' :: Position -> [Position] -> Int -- Also works when something was removed from the list!
+position2index' p ps = findIndex (== p) ps -- TODO: returns Maybe Int
+
+position2pip :: Position -> PipGrid ->  Int
+position2pip p pg = pg !! (position2index p)
+
+-- remove from list by index: take i items ++ drop (1 + i) items
+removeByIndex :: Int -> [a] -> [a]
+removeByIndex i xs = take i xs ++ drop (i + 1) xs 
+
+removePositionsFromList :: Position -> Position -> [Position] -> [Position]
+removePositionsFromList p1 p2 ps = removeByIndex (position2index' p2 ps) (removeByIndex (position2index' p1 ps) ps) -- PM: use appropriate position2index
+-- when removing two positions, update inbetween needed? 
+
 
 -- parseUserInput = ...
-
--- data Move = Left | Right | Up | Down -- note: Right is already defined in Data.Either
--- move :: Move -> Position -> Position
--- move Left (x, y) = (x 1, y)
--- move Right (x, y) = (x + 1, y)
--- move Up (x, y) = (x, y 1)
--- move Down (x, y) = (x, y + 1)
 
 -- printGrid :: Grid -> IO () -- NEEDS WORK
 -- printGrid ns = putStr [n ,n <- ns] 
