@@ -12,7 +12,7 @@ type Bone = (Int, Int) -- Bone with corresponding number of pips on the bone, id
 type PlacedBone = ((Position, Position), Int) -- bone spanning two positions, and its number -- PM: may also be placed in array with index position/number?
 
 type PipGrid = [Int] -- the input, with number of pips per position, corresponding with positions (see helper functions)
-type BoneGrid = [Int] -- the output(s), with bone number per position, , corresponding with positions (see helper functions)
+type BoneGrid = [Int] -- the output(s), with bone number per position, corresponding with positions (see helper functions)
 
 
 -- Settings of the solver --
@@ -24,32 +24,33 @@ height :: Int -- height of the board (y-direction)
 height = 7 
 
 
--- Setting the constraints -- 
-valid :: Position -> Position -> Bone -> Bool
-valid p1 p2 b == validOnBoard p1 && validOnBoard p2 && validOnFree p1 && validOnFree p2 && validPipMatch p1 p2 b && validNotUsed b
+-- Setting the constraints for options to be valid -- 
+valid :: (Position,Position) -> (Int,Int) -> [Position] -> Bone -> [Bones] -> Bool
+valid (p1,p2) (n1,n2) ps b bs == validOnBoard p1 && validOnBoard p2 && validOnFree p1 ps && validOnFree p2 ps && validPipMatch n1 n2 b && validNotUsed b bs
 
-validOnBoard :: Position -> Bool
+validOnBoard :: Position -> Bool -- checks if x- and y-coordinate of a position are within bounds of the board
 validOnBoard (x,y) | xValid x && yValid y = True
-                   | otherwise        = False
+                   | otherwise            = False
     where xValid x = x >= 0 && x < width
           yValid y = y >= 0 && y < height
 
-validOnFree :: Position -> Bool
-validOnFree p = undefined
--- could be checked when taken positions are removed from board list, but then index will lose its correspondence
+validOnFree :: Position -> [Positions] -> Bool -- checks if Position is in list of available Positions
+validOnFree p ps | elem p ps = True
+                 | otherwise = False
 
-validPipMatch :: Position -> Position -> Bone -> Bool
-validPipMatch p p b = undefined 
--- should check if pip at first position matches first pip of bone, same for second
+validPipMatch :: Position -> Position -> Bone -> Bool -- checks if pip at first position matches first pip of bone, same for second pip
+validPipMatch n1 n2 (nl,nr) | n1 == nl && n2 == nr = True
+                            | otherwise = False 
 
-validNotUsed :: Bone -> Bool
-validNotUsed b = undefined
--- should check if bone is already used: how?!
--- solution append to array, then check if in array
+validNotUsed :: Bone -> [Bones] -> Bool -- checks if Bone is in list of available Bones
+validNotUsed b bs | elem b bs = True
+                  | otherwise = False
+ -- every time calling function recursively, also provide argument with remaining bones (every step should have information to do its job)
+ -- PM: not nessecary if trying all bones from the remaining bones list (then this is implicitly enforced)
 
 
 -- Solving the problem -- 
-solve :: PipGrid -> [BoneGrid]
+solve :: PipGrid  -> [BoneGrid]
 solve = undefined
 -- CheckOrientaties voor positie (x,y) 
 -- Is ((x,y) , (x+1,y)) een valide mogelijkheid? 
@@ -60,7 +61,24 @@ solve = undefined
 --   Zonee:  = oplossing|iets doms 
 -- !! PM: orientation can also be "reversed" horizontal/vertical, because not all bones are symmetric
 -- misschien met een variable bord die in recursie steeds kleiner wordt als posities gevuld? Dan ook dat probleem ondervangen
+-- oplossing als alle bones geplaatst || laatste pip valide geplaatst
 
+-- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
+-- info mee naar benenden geven, en dan oplossingen naar boven (geen recursie opleveren)
+-- functies met veel input zijn iet erg, zeker niet aan het begin
+-- voor ons wss handiger om programma van onder (kleiner) naar boven te schrijven, omdat anders in begin al idee waar heen gaat nodig
+
+-- next position is head ps
+
+nextStepHorizontal :: Position -> [Positions] -> [Bones] -- for each bone taken from all remaining bones 
+nextStepHorizontal p n1 n2 ps bs = [checkHorizontal (orientation Horizontal p) (n1,n2) ps b bs | b <- bs] -- eventually shiftX and shiftY from generators?!
+
+-- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
+-- checkHorizontal :: PipGrid -> (Position, Position) -> [Positions] -> [Bones] -> BoneGrid
+checkHorizontal :: (Position, Position) -> (Int, Int) -> [Position] -> Bone -> [Bone] -> BoneGrid
+checkHorizontal (p1,p2) (n1,n2) ps b bs | valid (p1,p2) (n1,n2) ps b bs = undefined -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
+                                        | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
+                                        | otherwise = undefined -- end recursion, not all bones placed = nonesense
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -93,6 +111,13 @@ generateBones :: Int -> [Bone]
 generateBones 7 = []
 generateBones n = generateSerie n ++ generateBones (n+1)
     where generateSerie n = [(n,y) | y <- [n..6]]
+
+data Orientation = Horizontal | Vertical | InvHorizontal | InvVertical
+orientation :: Orientation -> Position -> (Position, Position)
+orientation Horizontal    (x,y) = ((x,y),(x+1,y))
+orientation Vertical      (x,y) = ((x,y),(x,y+1))
+orientation InvHorizontal (x,y) = ((x+1,y),(x,y))
+orientation InvVertical   (x,y) = ((x,y+1),(x,y))
 
 
 -- parseUserInput = ...
