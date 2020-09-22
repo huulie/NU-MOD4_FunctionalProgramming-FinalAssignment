@@ -77,9 +77,12 @@ nextStepHorizontal p ps pg bs = undefined -- [checkHorizontal (orientation Horiz
 -- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
 -- checkHorizontal :: PipGrid -> (Position, Position) -> [Positions] -> [Bones] -> BoneGrid
 checkHorizontal :: (Position, Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> b-- -> BoneGrid
-checkHorizontal (p1,p2) ps pg b bs | valid (p1,p2) ps pg b bs = undefined -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
+checkHorizontal (p1,p2) ps pg b bs | valid (p1,p2) ps pg b bs = nextStepHorizontal (orientation Horizontal (head ps))  (removeElementFromList(p2 removeElementFromList p1 ps)) BONE (removeElementFromList b bs) -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
                                    | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
                                    | otherwise = undefined -- end recursion, not all bones placed = nonesense
+
+-- tested with `valid ((0,0),(1,0)) positions examplePipGrid1 (6,6) bones` = True
+
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -126,8 +129,8 @@ position2index (x,y) = (y * width + x)
 position2pip :: Position -> PipGrid ->  Int
 position2pip p pg = pg !! (position2index p)
 
-removePositionFromList :: Position -> [Position] -> [Position]
-removePositionFromList p ps = filter (not . (==p)) ps
+removeElementFromList :: a -> [a] -> [a]
+removeElementFromList x xs = filter (not . (==x)) xs
 
 
 -- parseUserInput = ...
