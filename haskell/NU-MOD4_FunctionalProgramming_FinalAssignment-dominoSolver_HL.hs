@@ -71,17 +71,35 @@ solve = undefined
 
 -- next position is head ps
 
+-- generators
+
+-- idee om horizontaal en verticaal proberen wel goeD, recursieve functie moet horizontaal en verticaal proberen
+-- 1 functie recursief die algoritme vooruit stuwt, en dan een functie voor horizontaal en verticaal 
+-- probeer simpele functies te maken, ding wat aan elkaar knoopt is ingewikkeld apparaat
+-- Ik probeer nu list comprehensions aan elkaar te knopen
+-- functie doet zet en produceerd nieuw bord, probleem makkelijker: bord bijhouden dat ingevuld (eerst leeg, met bijv -1), per stap lijst van moves
+-- werk met kleine, simpele functies
+
+
+-- driver :: 
+-- driver = -- check alle orientaties, en als valide ga naar volgende positie met dat bord
+
 nextStepHorizontal :: Position -> [Position] -> PipGrid -> [Bone] -> a -- for each bone taken from all remaining bones 
 nextStepHorizontal p ps pg bs = undefined -- [checkHorizontal (orientation Horizontal p) ps pg b bs | b <- bs] -- eventually shiftX and shiftY from generators?!
 
 -- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
 -- checkHorizontal :: PipGrid -> (Position, Position) -> [Positions] -> [Bones] -> BoneGrid
-checkHorizontal :: (Position, Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> b-- -> BoneGrid
-checkHorizontal (p1,p2) ps pg b bs | valid (p1,p2) ps pg b bs = nextStepHorizontal (orientation Horizontal (head ps))  (removeElementFromList(p2 removeElementFromList p1 ps)) BONE (removeElementFromList b bs) -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
-                                   | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
-                                   | otherwise = undefined -- end recursion, not all bones placed = nonesense
+-- checkHorizontal :: (Position, Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> b-- -> BoneGrid
+-- checkHorizontal (p1,p2) ps pg b bs | valid (p1,p2) ps pg b bs = nextStepHorizontal (orientation Horizontal (head ps))  (removeElementFromList(p2 removeElementFromList p1 ps)) BONE (removeElementFromList b bs) -- next recrusion step, with (p1,p2) and b removed from ps resp. bs
+                                --    | length bs == 0 = undefined -- end recursion, all bones placed = solution -> BoneGrid                                        
+                                --    | otherwise = undefined -- end recursion, not all bones placed = nonesense
 
 -- tested with `valid ((0,0),(1,0)) positions examplePipGrid1 (6,6) bones` = True
+
+
+
+
+
 
 
 -- Running the solver program -- 
@@ -108,6 +126,9 @@ positions :: [Position] -- generates list of positions, ..  to map pips or bones
 positions = [(x,y) | y <- [0..height], x <- [0..width]]
 -- this maps the 2D-postions to a 1D-array, linear index, row-major order, starting at zero
 
+emptyBoneGrid :: BoneGrid
+emptyBoneGrid = take (height*width) (repeat (-1))
+
 bones :: [Bone] -- generates list of bones, index correspond to their number
 bones = generateBones 0
 
@@ -129,9 +150,22 @@ position2index (x,y) = (y * width + x)
 position2pip :: Position -> PipGrid ->  Int
 position2pip p pg = pg !! (position2index p)
 
-removeElementFromList :: a -> [a] -> [a]
+removeElementFromList :: Eq a => a -> [a] -> [a]
 removeElementFromList x xs = filter (not . (==x)) xs
 
+nextPosition :: [Position] -> Position
+nextPosition ps = head ps
+
+remainingPositions :: [Position] -> [Position]
+remainingPositions ps = tail ps
+
+checkSolution :: [Position] -> Bool -- checks if current board is solution
+checkSolution ps = (length ps) == 0
+
+placeBoneOnGrid :: Int -> (Position, Position) -> BoneGrid -> BoneGrid
+placeBoneOnGrid b p1 bg = take ((position2index p1)-1 bg) ++ [b] ++ (drop (position2index p1) bg)
+-- placeBoneOnGrid b (p1, p2) bg = 
+-- PM: input is bone number, in current implementation this can be looked up using bone list (but: returns maybe)
 
 -- parseUserInput = ...
 
