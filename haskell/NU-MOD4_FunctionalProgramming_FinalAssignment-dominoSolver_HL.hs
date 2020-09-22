@@ -123,8 +123,8 @@ orientation InvVertical   (x,y) = ((x,y+1),(x,y))
 position2index :: Position -> Int -- Only if nothing was removed from the list!
 position2index (x,y) = (y * width + x)
 
-position2index' :: Position -> [Position] -> Int -- Also works when something was removed from the list!
-position2index' p ps = findIndex (== p) ps -- TODO: returns Maybe Int
+-- position2index' :: Position -> [Position] -> Int -- Also works when something was removed from the list!
+-- position2index' p ps = findIndex (== p) ps -- TODO: returns Maybe Int
 
 position2pip :: Position -> PipGrid ->  Int
 position2pip p pg = pg !! (position2index p)
@@ -133,9 +133,18 @@ position2pip p pg = pg !! (position2index p)
 removeByIndex :: Int -> [a] -> [a]
 removeByIndex i xs = take i xs ++ drop (i + 1) xs 
 
-removePositionsFromList :: Position -> Position -> [Position] -> [Position]
-removePositionsFromList p1 p2 ps = removeByIndex (position2index' p2 ps) (removeByIndex (position2index' p1 ps) ps) -- PM: use appropriate position2index
--- when removing two positions, update inbetween needed? 
+-- removePositionFromList :: Position -> [Position] -> [Position]
+-- removePositionFromList p ps | (position2index' p ps == Just xs) = xs
+--                             | otherwise = ps
+-- remove (Just i) = i en daarmee "nieuwe ps"
+-- remove Nothing  = "oorspronkelijke ps"
+
+removePositionFromList :: Position -> [Position] -> [Position]
+removePositionFromList p ps = filter (not . (==p)) ps
+
+-- removePositionsFromList :: Position -> Position -> [Position] -> [Position]
+-- removePositionsFromList p1 p2 ps = removeByIndex (position2index' p2 ps) (removeByIndex (position2index' p1 ps) ps) -- PM: use appropriate position2index
+-- -- when removing two positions, update inbetween needed? 
 
 
 -- parseUserInput = ...
