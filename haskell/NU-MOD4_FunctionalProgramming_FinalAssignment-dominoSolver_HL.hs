@@ -10,6 +10,7 @@ import Data.List -- Needed for findIndex
 type Position = (Int, Int) -- (x,y) position on the grid, with origin (0,0) in left upper corner
 
 type Bone = (Int, Int) -- Bone with corresponding number of pips on the bone, identified by its number = index in bones (see helper functions)
+type Bone' = ((Int, Int), Int) -- Bone with corresponding number of pips on the bone, and its number
 type PlacedBone = ((Position, Position), Int) -- bone spanning two positions, and its number -- PM: may also be placed in array with index position/number?
 
 type PipGrid = [Int] -- the input, with number of pips per position, corresponding with positions (see helper functions)
@@ -73,7 +74,7 @@ solve = undefined
 
 -- generators
 
--- idee om horizontaal en verticaal proberen wel goeD, recursieve functie moet horizontaal en verticaal proberen
+-- idee om horizontaal en verticaal proberen wel goed, recursieve functie moet horizontaal en verticaal proberen
 -- 1 functie recursief die algoritme vooruit stuwt, en dan een functie voor horizontaal en verticaal 
 -- probeer simpele functies te maken, ding wat aan elkaar knoopt is ingewikkeld apparaat
 -- Ik probeer nu list comprehensions aan elkaar te knopen
@@ -81,8 +82,12 @@ solve = undefined
 -- werk met kleine, simpele functies
 
 
+-- Represent board, and there search next position (next empty spot): list of positions is "not human" and another list (wel voor bones)
+-- algrotime in kleine stapjes uitwerken en die implementeren
+
 -- driver :: 
 -- driver = -- check alle orientaties, en als valide ga naar volgende positie met dat bord
+
 
 nextStepHorizontal :: Position -> [Position] -> PipGrid -> [Bone] -> a -- for each bone taken from all remaining bones 
 nextStepHorizontal p ps pg bs = undefined -- [checkHorizontal (orientation Horizontal p) ps pg b bs | b <- bs] -- eventually shiftX and shiftY from generators?!
@@ -95,9 +100,6 @@ nextStepHorizontal p ps pg bs = undefined -- [checkHorizontal (orientation Horiz
                                 --    | otherwise = undefined -- end recursion, not all bones placed = nonesense
 
 -- tested with `valid ((0,0),(1,0)) positions examplePipGrid1 (6,6) bones` = True
-
-
-
 
 
 
@@ -137,6 +139,15 @@ generateBones 7 = []
 generateBones n = generateSerie n ++ generateBones (n+1)
     where generateSerie n = [(n,y) | y <- [n..6]]
 
+
+bones' :: [Bone'] -- generates list of bones, index correspond to their number
+bones' = generateBones' 0 1
+
+generateBones' :: Int -> Int -> [Bone']
+generateBones' 7 _ = []
+generateBones' s n = generateSerie' s n ++ generateBones' (s+1) (n + (7-s))
+    where generateSerie' s n = [((s,y), (n + y-s)) | y <- [s..6]] -- bone number calculation TODO
+
 data Orientation = Horizontal | Vertical | InvHorizontal | InvVertical
 orientation :: Orientation -> Position -> (Position, Position)
 orientation Horizontal    (x,y) = ((x,y),(x+1,y))
@@ -159,16 +170,37 @@ nextPosition ps = head ps
 remainingPositions :: [Position] -> [Position]
 remainingPositions ps = tail ps
 
-checkSolution :: [Position] -> Bool -- checks if current board is solution
-checkSolution ps = (length ps) == 0
+checkIfSolution :: [Position] -> Bool -- checks if current board is solution
+checkIfSolution ps = (length ps) == 0
 
-placeBoneOnGrid :: Int -> (Position, Position) -> BoneGrid -> BoneGrid
-placeBoneOnGrid b p1 bg = take ((position2index p1)-1 bg) ++ [b] ++ (drop (position2index p1) bg)
+-- placeBoneOnGrid :: Int -> (Position, Position) -> BoneGrid -> BoneGrid
+-- placeBoneOnGrid b p1 bg = take ((position2index p1)-1 bg) ++ [b] ++ (drop (position2index p1) bg)
 -- placeBoneOnGrid b (p1, p2) bg = 
 -- PM: input is bone number, in current implementation this can be looked up using bone list (but: returns maybe)
+
+checkOrientation :: Position -> Orientation -> [Position] -> PipGrid -> Bone -> [Bone] -> Bool
+checkOrientation p o ps pg b bs = valid (orientation o p) ps pg b bs -- | b <- bs] -- avoid list comprehension here?!
+
+-- checkPosition :: Position -> Orientation -> [Position] -> PipGrid -> Bone -> [Bones] -> Bool
+-- zelfde verhaal, maar dan met generator van orientaties 
+
+-- checkStep ps pg bs = [checkOrientation p o ps pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical], b <- bs, p <- ps]
+-- if ps/bs length == 0: stop recursion, found solution
+-- if true: remove p and b from list and recurse
+-- if false: stop recursion, nonesense
+
+
+
+
+
+
 
 -- parseUserInput = ...
 
 -- printGrid :: Grid -> IO () -- NEEDS WORK
 -- printGrid ns = putStr [n ,n <- ns] 
 --     where printRowHorz g y = [g!!i | x <-[0..WIDTH] ] ++ ['/n]
+
+
+-- instance Show Bone' where
+--     show ((pl, pr), n) = "( " ++ show pl ++ "," ++ show pr ++ ") - " ++ show n
