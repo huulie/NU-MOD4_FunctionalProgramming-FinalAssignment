@@ -22,8 +22,8 @@ height = 7
 
 
 -- Setting the constraints for options to be valid -- 
-valid :: (Position,Position) -> [Position] -> PipGrid -> Bone -> [Bone] -> Bool -- evaluates all critera below
-valid (p1,p2) ps pg b bs = validOnBoard p1 && validOnBoard p2 && validOnFree p1 ps && validOnFree p2 ps && validPipMatch (position2pip p1 pg) (position2pip p2 pg) b && validNotUsed b bs
+valid :: (Position,Position) -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool -- evaluates all critera below
+valid (p1,p2) bg pg b bs = validOnBoard p1 && validOnBoard p2 && validOnFree p1 bg && validOnFree p2 bg && validPipMatch (position2pip p1 pg) (position2pip p2 pg) b && validNotUsed b bs
 
 validOnBoard :: Position -> Bool -- checks if x- and y-coordinate of a position are within bounds of the board
 validOnBoard (x,y) | xValid x && yValid y = True
@@ -31,8 +31,8 @@ validOnBoard (x,y) | xValid x && yValid y = True
     where xValid x = x >= 0 && x < width
           yValid y = y >= 0 && y < height
 
-validOnFree :: Position -> [Position] -> Bool -- checks if Position is in list of available Positions
-validOnFree p ps | elem p ps = True
+validOnFree :: Position -> BoneGrid -> Bool -- checks if Position is in list of available Positions
+validOnFree p bg | bg !!(position2index p) == -1 = True
                  | otherwise = False
 
 validPipMatch :: Int -> Int -> Bone -> Bool -- checks if pip at first position matches first pip of bone, same for second pip
@@ -135,8 +135,8 @@ nextEmptyPosition bg p | bg !!(position2index (nextPosition p)) == -1 = nextPosi
 --    | otherwise = undefined -- end recursion, not all bones placed = nonesense
 
 
-checkOrientation :: Position -> Orientation -> [Position] -> PipGrid -> Bone -> [Bone] -> Bool
-checkOrientation p o ps pg b bs = valid (orientation o p) ps pg b bs
+checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool
+checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs
 -- if True, then putBoneOnGrid and iterate to next position 
 
 
@@ -154,8 +154,8 @@ changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosit
 
 
 --- PREVIOUS ATTEMPTS AND SCRAP PAD---
-checkOrientation :: Position -> Orientation -> [Position] -> PipGrid -> Bone -> [Bone] -> Bool
-checkOrientation p o ps pg b bs = valid (orientation o p) ps pg b bs -- | b <- bs] -- avoid list comprehension here?!
+-- checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool
+-- checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs -- | b <- bs] -- avoid list comprehension here?!
 
 -- checkStep ps pg bs = [checkOrientation p o ps pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical], b <- bs, p <- ps]
 -- if ps/bs length == 0: stop recursion, found solution
