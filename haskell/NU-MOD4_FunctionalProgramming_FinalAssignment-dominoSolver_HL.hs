@@ -119,11 +119,24 @@ nextPosition :: Position -> Position
 nextPosition p = index2position (position2index p +1)
 
 nextEmptyPosition :: BoneGrid -> Position -> Position -- next empty position on bonegrid bg, starteing from position p
-nextEmptyPosition bg p | bg !!(position2index (nextPosition p)) == -1 = nextPosition p
+nextEmptyPosition bg p | p == (width-1,height-1) = (0,0) -- TODO: start at beginning of board(?)
+                       | bg !!(position2index (nextPosition p)) == -1 = nextPosition p
                        | otherwise = nextEmptyPosition bg (nextPosition p)
 -- op die position, leg [elke overgebleven steen] voor alle 4 de orientaties, en ga dan evt recursief verder
 -- Positon -> Board
 
+tryNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [[BoneGrid]]  -- Try the place each of the remaining bones, SHOULD RETURN list of valid resulting BoneGrids and removes bone 
+tryNextPosition p bg pg bs | length bs == 0 = [[bg]] -- solution reached, return bone grid
+                           | otherwise = [tryOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
+-- tryNextPosition (0,0) emptyBoneGrid examplePipGrid1 bones  now makes the first step (and results in a nested list mess)
+
+tryOrientations :: Position -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid] -- Try the place a bone in each of the orientations, returns list of valid resulting BoneGrids 
+tryOrientations p bg pg b bs = [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
+-- tryOrientations (0,0) emptyBoneGrid examplePipGrid1 ((6,1),2) [((6,1),2)] resulted in [[],["valid bg"],[],[]]
+
+checkAndPlace :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> BoneGrid
+checkAndPlace p o bg pg b bs | checkOrientation p o bg pg b bs = putBoneOnGrid bg p o b -- here try next position
+                             | otherwise = []
 
 -- tryBones bs | null bs = "solution"
 --             | checkOrientation "with 4 orientations for each bone in bs"
