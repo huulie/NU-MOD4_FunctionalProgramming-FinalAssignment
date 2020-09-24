@@ -48,21 +48,25 @@ validNotUsed b bs | elem b bs = True
 
 -- Solving the problem -- 
 solve :: PipGrid  -> [BoneGrid]
-solve = undefined
--- CheckOrientaties voor positie (x,y) 
--- Is ((x,y) , (x+1,y)) een valide mogelijkheid? 
---   Zoja: CheckOrientaties voor de volgende positie 
---   Zonee: = oplossing|iets doms 
--- Is ((x,y), (x,y+1)) een valide mogelijkheid? 
---   Zoja: CheckOrientaties voor de volgende positie 
---   Zonee:  = oplossing|iets doms 
--- !! PM: orientation can also be "reversed" horizontal/vertical, because not all bones are symmetric
--- misschien met een variable bord die in recursie steeds kleiner wordt als posities gevuld? Dan ook dat probleem ondervangen
--- oplossing als alle bones geplaatst || laatste pip valide geplaatst
+solve pg = gotoNextPosition (-1,-1) emptyBoneGrid pg bones
 
--- driver :: 
--- driver = -- check alle orientaties, en als valide ga naar volgende positie met dat bord
--- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
+gotoNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid]  -- Try the place each of the remaining bones, SHOULD RETURN list of valid resulting BoneGrids and removes bone 
+gotoNextPosition p bg pg bs | null bs = [bg] -- solution reached, stop recursion (concatenating intermediate solutions) and start returning bone grid upwards
+                            | otherwise = concat [allOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
+-- tryNextPosition (0,0) emptyBoneGrid examplePipGrid1 bones
+-- tryNextPosition (-1,-1) emptyBoneGrid examplePipGrid1 bones
+
+allOrientations :: Position -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid] -- Try the place a bone in each of the orientations, returns list of valid resulting BoneGrids 
+allOrientations p bg pg b bs = concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
+-- tryOrientations (0,0) emptyBoneGrid examplePipGrid1 ((6,1),2) [((6,1),2)] resulted in [[],["valid bg"],[],[]]
+-- concat, en wees niet bang om twee BoneGrids te concatten: dat staat type systeem niet toe
+
+checkAndPlace :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid]
+checkAndPlace p o bg pg b bs | checkOrientation p o bg pg b bs = gotoNextPosition p (putBoneOnGrid bg p o b) pg (removeElementFromList b bs) -- here try next position
+                             | otherwise = []--[emptyBoneGrid]
+
+-- merk steeds meer "omhoog/omlaag" denken ipv in loopjes (helaas geen breakpoints/sysout)
+-- try bones and orientations, and flatten resulting array at each intermediate step
 
 
 -- Running the solver program -- 
@@ -82,6 +86,15 @@ examplePipGrid1 = [6, 6, 2, 6, 5, 2, 4, 1,
                    5, 1, 3, 6, 0, 4, 5, 5,
                    5, 5, 4, 0, 2, 6, 0, 3,
                    6, 0, 5, 3, 4, 2, 0, 3]
+
+examplePipGrid2 :: PipGrid
+examplePipGrid2 = [4, 2, 5, 2, 6, 3, 5, 4, 
+                   5, 0, 4, 3, 1, 4, 1, 1,
+                   1, 2, 3, 0, 2, 2, 2, 2,
+                   1, 0, 4, 3, 2, 1, 1, 2,
+                   4, 0, 6, 0, 3, 6, 6, 5,
+                   4, 0, 1, 6, 4, 0, 3, 0,
+                   6, 5, 3, 6, 2, 1, 5, 3]
 
 
 -- Helper functions --
@@ -120,45 +133,12 @@ nextPosition (-1,-1) = (0,0)
 nextPosition p = index2position (position2index p +1)
 
 nextEmptyPosition :: BoneGrid -> Position -> Position -- next empty position on bonegrid bg, starting from position p
-nextEmptyPosition bg p | p == (width-1,height-1) = (0,0) -- TODO: start at beginning of board(?)
+nextEmptyPosition bg p | p == (width-1,height-1) = (0,0) -- TODO: when on last position, start at beginning of board(?)
                        | bg !!(position2index (nextPosition p)) == -1 = nextPosition p
                        | otherwise = nextEmptyPosition bg (nextPosition p)
--- op die position, leg [elke overgebleven steen] voor alle 4 de orientaties, en ga dan evt recursief verder (valid) of stop (invalid)
-
-
--- keepTrying :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid] 
--- keepTrying p bg pg bs | null bs = [bg] -- PM: "collect" bone grids at the bottom
-
-
-
-
-tryNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid]  -- Try the place each of the remaining bones, SHOULD RETURN list of valid resulting BoneGrids and removes bone 
-tryNextPosition p bg pg bs | null bs = [bg] -- solution reached, return bone grid
-                           | otherwise = concat [tryOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
--- tryNextPosition (0,0) emptyBoneGrid examplePipGrid1 bones
-
-tryOrientations :: Position -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid] -- Try the place a bone in each of the orientations, returns list of valid resulting BoneGrids 
-tryOrientations p bg pg b bs = concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
--- tryOrientations (0,0) emptyBoneGrid examplePipGrid1 ((6,1),2) [((6,1),2)] resulted in [[],["valid bg"],[],[]]
--- concat, en wees niet bang om twee BoneGrids te concatten: dat staat type systeem niet toe
-
-checkAndPlace :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid]
-checkAndPlace p o bg pg b bs | checkOrientation p o bg pg b bs = tryNextPosition p (putBoneOnGrid bg p o b) pg (removeElementFromList b bs) -- here try next position
-                             | otherwise = []
-
-
-
-
--- tryBones bs | null bs = "solution"
---             | checkOrientation "with 4 orientations for each bone in bs"
-
--- maybe try bones and orientations, and flatten resulting array
-
 
 checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool
 checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs
--- if True, then putBoneOnGrid and iterate to next position 
-
 
 putBoneOnGrid :: BoneGrid -> Position -> Orientation -> Bone -> BoneGrid -- warning: only use AFTER checking that position + orientation is validOnBoard!
 putBoneOnGrid bg p o b = changeDualPositions bg (orientation o p) b
@@ -166,10 +146,6 @@ putBoneOnGrid bg p o b = changeDualPositions bg (orientation o p) b
 changeDualPositions :: BoneGrid -> (Position, Position) -> Bone -> BoneGrid 
 changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosition p1 bn bg)
     where replacePosition p bn bg  = take (position2index p) bg ++ [bn] ++ (drop (position2index p) bg)
-
--- tested with putBoneOnGrid emptyBoneGrid (0,0) Horizontal ((1,1),1) = [1,1,....]
-
-
 
 
 
