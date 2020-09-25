@@ -11,15 +11,17 @@ public class BoneSet {
        int n = 1;
        for (int l = 0; l < 7; l++) {
            for (int r = l ; r < 7; r++) {
-               bones[n] = new Bone(n, l, r);
+               bones[n-1] = new Bone(n, l, r);
                        n++;
            }
        }
-
    }
 
-    public static void main(String[] args) {
-        BoneSet test = new BoneSet();
-        System.out.println(test);
-    }
+    /**
+     * Returns the Double Six bone set as array of bones
+     * @return array of bones
+     */
+   public Bone[] returnBones () {
+       return bones;
+   }
 }
