@@ -15,10 +15,10 @@ type BoneGrid = [Int] -- the output(s), with bone number per position, correspon
 -- Settings of the solver --
 -- Board dimensions:
 width :: Int -- width of the board (x-direction)
-width = 2 --8 
+width = 8 
 
 height :: Int -- height of the board (y-direction)
-height = 2-- 7 
+height = 7 
 
 
 -- Setting the constraints for options to be valid -- 
@@ -31,7 +31,7 @@ validOnBoard (x,y) | xValid x && yValid y = True
     where xValid x = x >= 0 && x < width
           yValid y = y >= 0 && y < height
 
-validOnFree :: Position -> BoneGrid -> Bool -- checks if Position is in list of available Positions
+validOnFree :: Position -> BoneGrid -> Bool -- checks if Position is empty (== -1) in BoneGrid
 validOnFree p bg | bg !!(position2index p) == -1 = True
                  | otherwise = False
 
@@ -42,7 +42,6 @@ validPipMatch n1 n2 ((nl,nr),_) | n1 == nl && n2 == nr = True
 validNotUsed :: Bone -> [Bone] -> Bool -- checks if Bone is in list of available Bones
 validNotUsed b bs | elem b bs = True
                   | otherwise = False
- -- PM: every time calling function recursively, also provide argument with remaining bones (every step should have information to do its job)
  -- PM: not nessecary if trying all bones from the remaining bones list (then this is implicitly enforced)
 
 
@@ -51,18 +50,18 @@ solve :: PipGrid  -> [BoneGrid]
 solve pg = gotoNextPosition (-1,-1) emptyBoneGrid pg bones
 
 gotoNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid]  -- Try the place each of the remaining bones, SHOULD RETURN list of valid resulting BoneGrids and removes bone 
-gotoNextPosition p bg pg bs | null bs = [[8,8,8,8]]--[bg] -- solution reached, stop recursion (concatenating intermediate solutions) and start returning bone grid upwards
-                            | otherwise = concat [allOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
--- tryNextPosition (0,0) emptyBoneGrid examplePipGrid1 bones
--- tryNextPosition (-1,-1) emptyBoneGrid examplePipGrid1 bones
+-- gotoNextPosition p bg pg bs | null bs = [[8,8,8,8]]--[bg] -- solution reached, stop recursion (concatenating intermediate solutions) and start returning bone grid upwards
+gotoNextPosition p bg pg bs = concat [allOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
 
 allOrientations :: Position -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid] -- Try the place a bone in each of the orientations, returns list of valid resulting BoneGrids 
-allOrientations p bg pg b bs = concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
+allOrientations p bg pg b bs | boneSymmetrical b =  concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical]]
+                             | otherwise = concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
+                             where boneSymmetrical ((nl,nr),_) = nl == nr
 -- tryOrientations (0,0) emptyBoneGrid examplePipGrid1 ((6,1),2) [((6,1),2)] resulted in [[],["valid bg"],[],[]]
 -- concat, en wees niet bang om twee BoneGrids te concatten: dat staat type systeem niet toe
 
 checkAndPlace :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid]
-checkAndPlace p o bg pg b bs | length bs == 1 && checkOrientation p o bg pg b bs = [putBoneOnGrid bg p o b]
+checkAndPlace p o bg pg b bs | length bs == 1 = if checkOrientation p o bg pg b bs then [putBoneOnGrid bg p o b] else []
                              | checkOrientation p o bg pg b bs = gotoNextPosition p (putBoneOnGrid bg p o b) pg (removeElementFromList b bs) -- here try next position
                              | otherwise = []--[emptyBoneGrid]
 
@@ -80,6 +79,16 @@ checkAndPlace p o bg pg b bs | length bs == 1 && checkOrientation p o bg pg b bs
 -- WITH BREAKING RECURSION IN CHECKANDPLACE
 -- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
 -- [[1,1,2,2,-1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1]]
+-- AFTER FIXING CHANGEDUAL AND STOPPING RECURSION IN CHECKANDPLACE:
+-- EMPTY FOR FULLSIZE
+-- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
+-- [[1,1,2,2],[1,2,1,2],[1,1,2,2],[1,2,1,2]]
+-- AND WITHOUT SYMMETRIC BONES
+-- Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [1,2,3,4]  [((1,2),1) , ((3,4),2)]
+-- [[1,1,2,2]]
+-- WITH NON-SQUARE BOARD:
+-- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1,-1,-1]  [1,2,3,0,0,4] [((1,2),1), ((3,4),2) , ((0,0),3)]
+-- [[1,1,2,3,3,2],[1,1,2,3,3,2]]
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -122,7 +131,7 @@ bones = generateBones 0 1
 generateBones :: Int -> Int -> [Bone]
 generateBones 7 _ = []
 generateBones s n = generateSerie s n ++ generateBones (s+1) (n + (7-s))
-    where generateSerie s n = [((s,y), (n + y-s)) | y <- [s..6]] -- bone number calculation TODO
+    where generateSerie s n = [((s,y), (n + y-s)) | y <- [s..6]]
 
 data Orientation = Horizontal | Vertical | InvHorizontal | InvVertical
 orientation :: Orientation -> Position -> (Position, Position)
@@ -154,8 +163,6 @@ checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs
 
 putBoneOnGrid :: BoneGrid -> Position -> Orientation -> Bone -> BoneGrid -- warning: only use AFTER checking that position + orientation is validOnBoard!
 putBoneOnGrid bg p o b = changeDualPositions bg (orientation o p) b
--- *Main> putBoneOnGrid [-1,-1,-1,-1] (1,1) Horizontal ((0,1),1)
--- [-1,-1,-1,-1,1,1]
 
 changeDualPositions :: BoneGrid -> (Position, Position) -> Bone -> BoneGrid 
 changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosition p1 bn bg)
@@ -200,3 +207,58 @@ changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosit
 -- ik schrijf nu meer in for loopjes (vermomd als list comprehension), dat is imperatief
 -- moet toe naar zoek lege postitie -> leg daar steen neer in 4 mogelijke orientaties -> en doet dit nog keer, tot stenen op zijn
 -- bedenk goed dat je niks kunt veranderen, alleen nieuwe versie door kunt geven
+
+
+-- TEST WITH EXAMPLE 1, WHICH doesn't HAS A SINGLE SOLUTION:
+-- [
+-- 28,28,14, 7,17,17,11,11,
+-- 10,10,14, 7, 2, 2,21,23,
+--  8, 4,16,25,25,13,21,23,
+--  8, 4,16,15,15,13, 9, 9,
+-- 12,12,22,22, 5, 5,26,26,
+-- 27, 6,24, 3, 3,18, 1,19,
+-- 27, 6,24,20,20,18, 1,19
+
+-- >> 24 EN 6 ZIJN OMGEDRAAID,
+-- 6 ZOU 5 0 MOETEN ZIJN: IS 0 5 DUS KLOPT
+-- 24 ZOU 4 5 MOETEN ZIJN: IS 4 5 DUS KLOPT
+
+
+-- ],[
+-- 28,28,14,7,17,17,11,11,
+-- 10,10,14,7,2,2,21,23,
+-- 8,4,16,25,25,13,21,23,
+-- 8,4,16,15,15,13,9,9,
+-- 12,12,22,22,5,5,26,26,
+-- 27,24,24,3,3,18,1,19,
+-- 27,6,6,20,20,18,1,19
+
+-- >> KLOPT MET VOORBEELD,
+-- 24 ZOU 5 4 MOETEN ZIJN DUS KLOPT
+-- 6 ZOU 0 5 MOETEN ZIJN DUS KLOPT
+
+
+-- ],[
+-- 28,28,14, 7,17,17,11,11,
+-- 10,10,14, 7, 2, 2,21,23,
+--  8,15,15,20,18,13,21,23,
+--  8, 5, 5,20,18,13, 9, 9,
+-- 12,12,22,22, 3,25,26,26,
+-- 27, 6,24, 4, 3,25, 1,19,
+-- 27, 6,24, 4,16,16, 1,19
+
+-- >> ik kan niet tot 8 tellen, klopt wel
+
+
+-- ],[
+-- 28,28,14, 7,17,17,11,11,
+-- 10,10,14, 7, 2, 2,21,23,
+--  8,15,15,20,18,13,21,23,
+--  8, 5, 5,20,18,13, 9, 9,
+-- 12,12,22,22, 3,25,26,26,
+-- 27,24,24, 4, 3,25, 1,19,
+-- 27, 6, 6, 4,16,16, 1,19
+
+-- >> ik kan niet tot 8 tellen, klopt wel
+
+-- ]]
