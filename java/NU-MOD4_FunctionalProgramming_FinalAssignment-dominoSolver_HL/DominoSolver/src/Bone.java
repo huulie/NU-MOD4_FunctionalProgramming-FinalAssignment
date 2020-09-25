@@ -21,4 +21,16 @@ public class Bone {
         this.pipsRight = pipsRight;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
+    public int getPipsLeft() {
+        return pipsLeft;
+    }
+
+    public int getPipsRight() {
+        return pipsRight;
+    }
+
 }
