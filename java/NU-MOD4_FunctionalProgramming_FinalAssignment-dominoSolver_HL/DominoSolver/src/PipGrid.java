@@ -6,4 +6,12 @@ public class PipGrid extends Grid {
      */
     private int[][] pips;
 
+    PipGrid () {
+        pips = new int[WIDTH][HEIGHT];
+    }
+
+    public int getPip (Position position) {
+        return pips[position.getX()][position.getY()];
+    }
+
 }
