@@ -5,6 +5,7 @@
 --              Written by Huub Lievestro              --
 --     with help from Teun van Hemert (supervisor)     --
 
+import Data.List
 
 -- Definition of types, to descrive the problem -- 
 type Position = (Int, Int)    -- (x,y) position on the grid, with origin (0,0) in left upper corner
@@ -143,11 +144,20 @@ changeDualPositions :: BoneGrid -> (Position, Position) -> Bone -> BoneGrid
 changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosition p1 bn bg)
     where replacePosition p bn bg  = take (position2index p) bg ++ [bn] ++ drop (position2index p +1) bg
 
--- to do IO things:
+-- for IO things:
+-- -- parseUserInput:: String -> [String]
+-- parseUserInput i = splitOn "," i
+-- -- parseUserInput = ...
 
--- parseUserInpuit i = splitOn "," i
--- parseUserInput = ...
+-- line with n items from list xs
+-- printListLine :: Int -> [a] -> IO ()
+-- printListLine _ [] = []
+-- printListLine n xs = splitAt n xs
+--     where printLine (l, n) = putStrLn l printListLine n 
 
+
+-- n < 10 = "0" + n
+-- otherwise = n
 -- printGrid :: Grid -> IO () -- NEEDS WORK
 -- printGrid ns = putStr [n ,n <- ns] 
 --     where printRowHorz g y = [g!!i | x <-[0..WIDTH] ] ++ ['/n]
