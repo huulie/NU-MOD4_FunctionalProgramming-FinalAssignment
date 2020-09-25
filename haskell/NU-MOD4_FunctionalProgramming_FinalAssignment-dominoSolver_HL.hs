@@ -3,13 +3,14 @@
 --      Module 4: the critical software developer      -- 
 --        Nedap University [5] - September 2020        --
 --              Written by Huub Lievestro              --
+--     with help from Teun van Hemert (supervisor)     --
 
 
 -- Definition of types, to descrive the problem -- 
-type Position = (Int, Int) -- (x,y) position on the grid, with origin (0,0) in left upper corner
+type Position = (Int, Int)    -- (x,y) position on the grid, with origin (0,0) in left upper corner
 type Bone = ((Int, Int), Int) -- Bone with corresponding number of pips on the bone, and its number
-type PipGrid = [Int] -- the input, with number of pips per position, corresponding with positions (see helper functions)
-type BoneGrid = [Int] -- the output(s), with bone number per position, corresponding with positions (see helper functions)
+type PipGrid = [Int]          -- the input, with number of pips per position, indices corresponding with positions (see helper functions)
+type BoneGrid = [Int]         -- an output (one possible solution), with bone number per position (or -1 for empty), indices corresponding with positions (see helper functions)
 
 
 -- Settings of the solver --
@@ -22,7 +23,7 @@ height = 7
 
 
 -- Setting the constraints for options to be valid -- 
-valid :: (Position,Position) -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool -- evaluates all critera below
+valid :: (Position,Position) -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool -- evaluates all constraints below
 valid (p1,p2) bg pg b bs = validOnBoard p1 && validOnBoard p2 && validOnFree p1 bg && validOnFree p2 bg && validPipMatch (position2pip p1 pg) (position2pip p2 pg) b && validNotUsed b bs
 
 validOnBoard :: Position -> Bool -- checks if x- and y-coordinate of a position are within bounds of the board
@@ -42,53 +43,26 @@ validPipMatch n1 n2 ((nl,nr),_) | n1 == nl && n2 == nr = True
 validNotUsed :: Bone -> [Bone] -> Bool -- checks if Bone is in list of available Bones
 validNotUsed b bs | elem b bs = True
                   | otherwise = False
- -- PM: not nessecary if trying all bones from the remaining bones list (then this is implicitly enforced)
+ -- Note: if trying only bones from the remaining bones list, this constraint is implicitly enforced
 
 
 -- Solving the problem -- 
 solve :: PipGrid  -> [BoneGrid]
 solve pg = gotoNextPosition (-1,-1) emptyBoneGrid pg bones
 
-gotoNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid]  -- Try the place each of the remaining bones, SHOULD RETURN list of valid resulting BoneGrids and removes bone 
--- gotoNextPosition p bg pg bs | null bs = [[8,8,8,8]]--[bg] -- solution reached, stop recursion (concatenating intermediate solutions) and start returning bone grid upwards
+gotoNextPosition :: Position -> BoneGrid -> PipGrid -> [Bone] -> [BoneGrid]  -- Finds next empty position and tries each of the remaining bones, returns list of valid resulting BoneGrid 
 gotoNextPosition p bg pg bs = concat [allOrientations (nextEmptyPosition bg p) bg pg b bs | b <- bs]
 
 allOrientations :: Position -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid] -- Try the place a bone in each of the orientations, returns list of valid resulting BoneGrids 
 allOrientations p bg pg b bs | boneSymmetrical b =  concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical]]
                              | otherwise = concat [checkAndPlace p o bg pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical]]
-                             where boneSymmetrical ((nl,nr),_) = nl == nr
--- tryOrientations (0,0) emptyBoneGrid examplePipGrid1 ((6,1),2) [((6,1),2)] resulted in [[],["valid bg"],[],[]]
--- concat, en wees niet bang om twee BoneGrids te concatten: dat staat type systeem niet toe
+                             where boneSymmetrical ((nl,nr),_) = nl == nr -- don't show both solutions for a symmetrical bone
 
 checkAndPlace :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> [BoneGrid]
-checkAndPlace p o bg pg b bs | length bs == 1 = if checkOrientation p o bg pg b bs then [putBoneOnGrid bg p o b] else []
-                             | checkOrientation p o bg pg b bs = gotoNextPosition p (putBoneOnGrid bg p o b) pg (removeElementFromList b bs) -- here try next position
-                             | otherwise = []--[emptyBoneGrid]
+checkAndPlace p o bg pg b bs | length bs == 1 = if checkOrientation p o bg pg b bs then [putBoneOnGrid bg p o b] else [] -- if placing last bone, stop with recursing
+                             | checkOrientation p o bg pg b bs = gotoNextPosition p (putBoneOnGrid bg p o b) pg (removeElementFromList b bs) -- try next position (recursive)
+                             | otherwise = []
 
--- merk steeds meer "omhoog/omlaag" denken ipv in loopjes (helaas geen breakpoints/sysout)
--- try bones and orientations, and flatten resulting array at each intermediate step
-
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
--- [[1,1,2,2,-1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1]]
--- REMOVED [BG]
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
--- []
--- ALS BIJ NULL BS: [[8,8,8,8]]
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
--- [[8,8,8,8],[8,8,8,8],[8,8,8,8]]
--- WITH BREAKING RECURSION IN CHECKANDPLACE
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
--- [[1,1,2,2,-1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1],[1,2,-1,2,1,-1,-1,-1]]
--- AFTER FIXING CHANGEDUAL AND STOPPING RECURSION IN CHECKANDPLACE:
--- EMPTY FOR FULLSIZE
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [0,0,0,1]  [((0,0),1) , ((0,1),2)]
--- [[1,1,2,2],[1,2,1,2],[1,1,2,2],[1,2,1,2]]
--- AND WITHOUT SYMMETRIC BONES
--- Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1]  [1,2,3,4]  [((1,2),1) , ((3,4),2)]
--- [[1,1,2,2]]
--- WITH NON-SQUARE BOARD:
--- *Main> gotoNextPosition (-1,-1) [-1,-1,-1,-1,-1,-1]  [1,2,3,0,0,4] [((1,2),1), ((3,4),2) , ((0,0),3)]
--- [[1,1,2,3,3,2],[1,1,2,3,3,2]]
 
 -- Running the solver program -- 
 -- Ask for input:
@@ -99,7 +73,7 @@ dominoSolver = do putStrLn "Type an input (linear notation, row-major order): "
                   --  solve input
 
 -- or use one of the example PipGrids:
-examplePipGrid1 :: PipGrid
+examplePipGrid1 :: PipGrid -- has 4 solutions
 examplePipGrid1 = [6, 6, 2, 6, 5, 2, 4, 1, 
                    1, 3, 2, 0, 1, 0, 3, 4,
                    1, 3, 2, 4, 6, 6, 5, 4,
@@ -108,7 +82,7 @@ examplePipGrid1 = [6, 6, 2, 6, 5, 2, 4, 1,
                    5, 5, 4, 0, 2, 6, 0, 3,
                    6, 0, 5, 3, 4, 2, 0, 3]
 
-examplePipGrid2 :: PipGrid
+examplePipGrid2 :: PipGrid -- has 2 solutions
 examplePipGrid2 = [4, 2, 5, 2, 6, 3, 5, 4, 
                    5, 0, 4, 3, 1, 4, 1, 1,
                    1, 2, 3, 0, 2, 2, 2, 2,
@@ -119,13 +93,14 @@ examplePipGrid2 = [4, 2, 5, 2, 6, 3, 5, 4,
 
 
 -- Helper functions --
+-- for the solver:
 removeElementFromList :: Eq a => a -> [a] -> [a]
 removeElementFromList x xs = filter (not . (==x)) xs
 
-emptyBoneGrid :: BoneGrid
+emptyBoneGrid :: BoneGrid -- generates empty BoneGrid, filled with -1
 emptyBoneGrid = take (height*width) (repeat (-1))
 
-bones :: [Bone] -- generates list of bones, index correspond to their number
+bones :: [Bone] -- generates list of bones, generating a Double Six dominoes set
 bones = generateBones 0 1
 
 generateBones :: Int -> Int -> [Bone]
@@ -140,25 +115,25 @@ orientation Vertical      (x,y) = ((x,y),(x,y+1))
 orientation InvHorizontal (x,y) = ((x+1,y),(x,y))
 orientation InvVertical   (x,y) = ((x,y+1),(x,y))
 
-position2pip :: Position -> PipGrid ->  Int
+position2pip :: Position -> PipGrid ->  Int -- gets number of pips at a Position in the PipGrid
 position2pip p pg = pg !! (position2index p)
 
-position2index :: Position -> Int -- Only if nothing was removed from the list!
+position2index :: Position -> Int -- warning: Only if nothing was removed from the list!
 position2index (x,y) = (y * width + x)
 
-index2position :: Int -> Position -- Only if nothing was removed from the list!
+index2position :: Int -> Position -- warning: Only if nothing was removed from the list!
 index2position i = (i `mod` width, i `div` width)
 
-nextPosition :: Position -> Position
+nextPosition :: Position -> Position -- returns next position on the grid, row-major order
 nextPosition (-1,-1) = (0,0)
 nextPosition p = index2position (position2index p +1)
 
 nextEmptyPosition :: BoneGrid -> Position -> Position -- next empty position on bonegrid bg, starting from position p
-nextEmptyPosition bg p | p == (width-1,height-1) = (0,0) -- TODO: when on last position, start at beginning of board(?)
+nextEmptyPosition bg p | p == (width-1,height-1) = (0,0) -- note: when on last position, start at beginning of board
                        | bg !!(position2index (nextPosition p)) == -1 = nextPosition p
                        | otherwise = nextEmptyPosition bg (nextPosition p)
 
-checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool
+checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool -- Checks if Bone with Orientation is valid on BoneGrid and PipGrid
 checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs
 
 putBoneOnGrid :: BoneGrid -> Position -> Orientation -> Bone -> BoneGrid -- warning: only use AFTER checking that position + orientation is validOnBoard!
@@ -168,97 +143,11 @@ changeDualPositions :: BoneGrid -> (Position, Position) -> Bone -> BoneGrid
 changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosition p1 bn bg)
     where replacePosition p bn bg  = take (position2index p) bg ++ [bn] ++ drop (position2index p +1) bg
 
+-- to do IO things:
 
--- replaceInList idx v xs = ys ++ (v:zs)
---                          where (ys, _:zs) = splitAt idx xs
-
---- PREVIOUS ATTEMPTS AND SCRAP PAD---
--- checkOrientation :: Position -> Orientation -> BoneGrid -> PipGrid -> Bone -> [Bone] -> Bool
--- checkOrientation p o bg pg b bs = valid (orientation o p) bg pg b bs -- | b <- bs] -- avoid list comprehension here?!
-
--- checkStep ps pg bs = [checkOrientation p o ps pg b bs | o <- [Horizontal, Vertical, InvHorizontal, InvVertical], b <- bs, p <- ps]
--- if ps/bs length == 0: stop recursion, found solution
--- if true: remove p and b from list and recurse
--- if false: stop recursion, nonesense
-
+-- parseUserInpuit i = splitOn "," i
 -- parseUserInput = ...
 
 -- printGrid :: Grid -> IO () -- NEEDS WORK
 -- printGrid ns = putStr [n ,n <- ns] 
 --     where printRowHorz g y = [g!!i | x <-[0..WIDTH] ] ++ ['/n]
-
-
---- FEEDBACK ---
--- meegeven: input, beschikbare posities, beschikbare bones, oplossing tot nu toe
--- info mee naar benenden geven, en dan oplossingen naar boven (geen recursie opleveren)
--- functies met veel input zijn niet erg, zeker niet aan het begin
--- voor ons wss handiger om programma van onder (kleiner) naar boven te schrijven, omdat anders in begin al idee waar heen gaat nodig
-
--- idee om horizontaal en verticaal proberen wel goed, recursieve functie moet horizontaal en verticaal proberen
--- 1 functie recursief die algoritme vooruit stuwt, en dan een functie voor horizontaal en verticaal 
--- probeer simpele functies te maken, ding wat aan elkaar knoopt is ingewikkeld apparaat
--- Ik probeer nu list comprehensions aan elkaar te knopen
--- functie doet zet en produceerd nieuw bord, probleem makkelijker: bord bijhouden dat ingevuld (eerst leeg, met bijv -1), per stap lijst van moves
--- werk met kleine, simpele functies
-
--- Represent board, and there search next position (next empty spot): list of positions is "not human" and another list (wel voor bones)
--- algrotime in kleine stapjes uitwerken en die implementeren
-
--- ik schrijf nu meer in for loopjes (vermomd als list comprehension), dat is imperatief
--- moet toe naar zoek lege postitie -> leg daar steen neer in 4 mogelijke orientaties -> en doet dit nog keer, tot stenen op zijn
--- bedenk goed dat je niks kunt veranderen, alleen nieuwe versie door kunt geven
-
-
--- TEST WITH EXAMPLE 1, WHICH doesn't HAS A SINGLE SOLUTION:
--- [
--- 28,28,14, 7,17,17,11,11,
--- 10,10,14, 7, 2, 2,21,23,
---  8, 4,16,25,25,13,21,23,
---  8, 4,16,15,15,13, 9, 9,
--- 12,12,22,22, 5, 5,26,26,
--- 27, 6,24, 3, 3,18, 1,19,
--- 27, 6,24,20,20,18, 1,19
-
--- >> 24 EN 6 ZIJN OMGEDRAAID,
--- 6 ZOU 5 0 MOETEN ZIJN: IS 0 5 DUS KLOPT
--- 24 ZOU 4 5 MOETEN ZIJN: IS 4 5 DUS KLOPT
-
-
--- ],[
--- 28,28,14,7,17,17,11,11,
--- 10,10,14,7,2,2,21,23,
--- 8,4,16,25,25,13,21,23,
--- 8,4,16,15,15,13,9,9,
--- 12,12,22,22,5,5,26,26,
--- 27,24,24,3,3,18,1,19,
--- 27,6,6,20,20,18,1,19
-
--- >> KLOPT MET VOORBEELD,
--- 24 ZOU 5 4 MOETEN ZIJN DUS KLOPT
--- 6 ZOU 0 5 MOETEN ZIJN DUS KLOPT
-
-
--- ],[
--- 28,28,14, 7,17,17,11,11,
--- 10,10,14, 7, 2, 2,21,23,
---  8,15,15,20,18,13,21,23,
---  8, 5, 5,20,18,13, 9, 9,
--- 12,12,22,22, 3,25,26,26,
--- 27, 6,24, 4, 3,25, 1,19,
--- 27, 6,24, 4,16,16, 1,19
-
--- >> ik kan niet tot 8 tellen, klopt wel
-
-
--- ],[
--- 28,28,14, 7,17,17,11,11,
--- 10,10,14, 7, 2, 2,21,23,
---  8,15,15,20,18,13,21,23,
---  8, 5, 5,20,18,13, 9, 9,
--- 12,12,22,22, 3,25,26,26,
--- 27,24,24, 4, 3,25, 1,19,
--- 27, 6, 6, 4,16,16, 1,19
-
--- >> ik kan niet tot 8 tellen, klopt wel
-
--- ]]
