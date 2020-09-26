@@ -5,20 +5,38 @@ public class BoneGrid extends Grid {
      */
     private Bone[][] bones;
 
+
     BoneGrid () {
         bones = new Bone[WIDTH][HEIGHT];
     }
 
-    private Bone getBone (Position position) {
+    public Bone getBone(Position position) {
         return bones[position.getX()][position.getY()];
     }
 
-    private void setBone (Bone bone, Position position) {
+    public void setBone(Bone bone, Position position) {
         bones[position.getX()][position.getY()] = bone;
     }
 
-    private BoneGrid deepCopy() throws CloneNotSupportedException {
-        return (BoneGrid) this.clone(); // TODO casting?
+    public Position nextEmpty(Position position) {
+        Position currentPosition = position;
+
+        if (Position.next(currentPosition) == null) {
+            return Position.next(currentPosition);
+        } else {
+            return nextEmpty(Position.next(currentPosition)); // TODO right to return?
+        }
+    }
+
+    public BoneGrid copy() {
+        BoneGrid copiedGrid = null;
+        try {
+            copiedGrid = (BoneGrid) this.clone(); // TODO casting?
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            // TODO errorhandling
+        }
         // TODO no problem if Bone objects are existing references, and no new objects
+        return copiedGrid;
     }
 }

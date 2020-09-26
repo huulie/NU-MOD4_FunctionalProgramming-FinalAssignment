@@ -1,7 +1,7 @@
 public class Grid {
 
-    protected final int WIDTH = 8; // TODO make configurable?
-    protected final int HEIGHT = 7; // TODO make configurable?
+    protected final static int WIDTH = 8; // TODO make configurable? modifiers
+    protected final static int HEIGHT = 7; // TODO make configurable? modifiers
 
     private Object[][] elements;
 
@@ -23,7 +23,7 @@ public class Grid {
 
 //   private grid DeepCopy TODO
 
-   public class Position {
+   public static class Position {
        /**
         * Column
         */
@@ -55,15 +55,15 @@ public class Grid {
            this.y = y;
        }
 
-       public int position2index(Position position) {
+       public static int position2index(Position position) {
           return position.getY() * WIDTH + position.getX();
        }
 
-       public Position index2position(int index) {
+       public static Position index2position(int index) {
            return new Position(index % WIDTH, index / WIDTH);
        }
 
-       private Position next (Position position) {
+       public static Position next(Position position) { // TODO modifier
            if (position.getX() == WIDTH && position.getY() == HEIGHT) {
                return new Position(0,0);
            } else {
@@ -72,10 +72,10 @@ public class Grid {
        }
 
        // TODO keep orientations here, and inverse?
-       private Position horizontal(Position position) {
+       public static Position horizontal(Position position) {
            return new Position(position.getX()+1, position.getY());
        }
-       private Position vertical(Position position) {
+       public static Position vertical(Position position) {
            return new Position(position.getX(), position.getY()+1);
        }
    }

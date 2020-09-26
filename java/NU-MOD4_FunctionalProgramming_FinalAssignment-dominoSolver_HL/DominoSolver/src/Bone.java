@@ -33,4 +33,8 @@ public class Bone {
         return pipsRight;
     }
 
+    public boolean isSymmetrical () {
+        return this.getPipsLeft() == this.getPipsRight();
+    }
+
 }
