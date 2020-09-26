@@ -10,8 +10,21 @@ public class PipGrid extends Grid {
         pips = new int[WIDTH][HEIGHT];
     }
 
+    private void setPip(Position position, int pip) {
+        pips[position.getX()][position.getY()] = pip;
+    }
+
     public int getPip (Position position) {
         return pips[position.getX()][position.getY()];
+    }
+
+    public static PipGrid arrayToGrid(int[] array) {
+        //TODO impement more elegantly?
+        PipGrid pipGrid = new PipGrid();
+        for(int i = 0; i < HEIGHT*WIDTH; i++) {
+            pipGrid.setPip(Grid.Position.index2position(i),array[i]);
+        }
+        return pipGrid;
     }
 
 }

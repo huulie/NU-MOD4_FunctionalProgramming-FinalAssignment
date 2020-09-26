@@ -19,10 +19,8 @@ public class Solver {
 
     /**
      * Creates a new solver, to solve at least one of your problems
-     * @param input to solve
      */
-    public Solver(PipGrid input) {
-        this.input = input;
+    public Solver() {
         this.solutions = new ArrayList<BoneGrid>();
     }
 
@@ -31,7 +29,8 @@ public class Solver {
      * @param input to solve
      * @return
      */
-    private List solve (PipGrid input ) {
+    public List solve (PipGrid input) {
+        this.input = input;
       BoneGrid currentBoard = new BoneGrid();
       Bone[] availableBones = new BoneSet().returnBones();
 
