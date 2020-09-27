@@ -1,6 +1,5 @@
 public class PipGrid extends Grid {
 
-
     /**
      * Grid with number of pips (input for the solver)
      */
@@ -18,13 +17,12 @@ public class PipGrid extends Grid {
         return pips[position.getX()][position.getY()];
     }
 
-    public static PipGrid arrayToGrid(int[] array) {
-        //TODO impement more elegantly?
+    public static PipGrid arrayToGrid(int[] array1D) {
         PipGrid pipGrid = new PipGrid();
         for(int i = 0; i < HEIGHT*WIDTH; i++) {
-            pipGrid.setPip(Grid.Position.index2position(i),array[i]);
+            pipGrid.setPip(Grid.Position.index2position(i),array1D[i]);
         }
+
         return pipGrid;
     }
-
 }

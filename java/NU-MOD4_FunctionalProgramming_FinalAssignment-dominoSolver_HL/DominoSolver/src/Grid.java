@@ -1,7 +1,7 @@
 public class Grid {
 
-    protected final static int WIDTH = 8; // TODO make configurable? modifiers
-    protected final static int HEIGHT = 7; // TODO make configurable? modifiers
+    protected final static int WIDTH = 8;
+    protected final static int HEIGHT = 7;
 
     private Object[][] elements;
 
@@ -20,8 +20,6 @@ public class Grid {
    private void setElement (Object element, Position position) {
        elements[position.getX()][position.getY()] = element;
    }
-
-//   private grid DeepCopy TODO
 
    public static class Position {
        /**
@@ -71,10 +69,20 @@ public class Grid {
            }
        }
 
-       // TODO keep orientations here, and inverse?
+       /**
+        * Returns second position, that is horizontal to the first position
+        * @param position as reference
+        * @return position horizontal from reference
+        */
        public static Position horizontal(Position position) {
            return new Position(position.getX()+1, position.getY());
        }
+
+       /**
+        * Returns second position, that is vertical to the first position
+        * @param position as reference
+        * @return position vertical from reference
+        */
        public static Position vertical(Position position) {
            return new Position(position.getX(), position.getY()+1);
        }

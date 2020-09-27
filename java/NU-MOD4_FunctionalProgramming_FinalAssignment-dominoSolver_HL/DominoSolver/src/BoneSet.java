@@ -28,10 +28,14 @@ public class BoneSet {
        return bones;
    }
 
+    /**
+     * Creates a new List of Bones, identical to the original Bone List.
+     * @param original to copy
+     * @return a copy of the original
+     */
    public static List<Bone> copyBoneList(List<Bone> original) {
        List<Bone> copiedList = new ArrayList<Bone>();
        copiedList.addAll(original);
        return copiedList;
    }
-
 }

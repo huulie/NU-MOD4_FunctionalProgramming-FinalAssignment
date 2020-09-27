@@ -25,35 +25,29 @@ public class BoneGrid extends Grid {
 
     public Position nextEmpty(Position position) {
         if(position.getX() == -1 && position.getY() == -1) {
-            return new Position(0,0);
+            return new Position(0,0); // starting position
         }
 
         Position currentPosition = position;
 
-        while (this.getBone(currentPosition) != null) { // TODO infinite loop protection?
+        while (this.getBone(currentPosition) != null) {
             currentPosition = Position.next(currentPosition);
             if(!isOnBoard(currentPosition)) {
-                System.out.println("Searching next free got out of bounds, even with next starting at origin again"); // TODO
-                return null;
+                return null; // should never happen, because next starts at origin again
             }
         }
-        return currentPosition; // TODO right to return?
+        return currentPosition;
     }
 
     public BoneGrid copy() {
         BoneGrid copiedGrid = new BoneGrid();
-//        try {
-//            copiedGrid = (BoneGrid) this.clone(); // TODO casting?
-//        } catch (CloneNotSupportedException e) {
-//            e.printStackTrace();
-//            // TODO errorhandling
-//        }
+
         for (int i = 0; i < HEIGHT*WIDTH; i++) {
             if (this.getBone(Position.index2position(i)) != null) { // if null, keep null
                 copiedGrid.setBone(this.getBone(Position.index2position(i)), Position.index2position(i));
             }
         }
-        // TODO no problem if Bone objects are existing references, and no new objects
+
         return copiedGrid;
     }
 }

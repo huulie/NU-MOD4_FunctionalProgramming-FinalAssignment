@@ -10,15 +10,39 @@ public class TUI {
 
     public static void main(String[] args) {
         // ask user for input, give that input to the solver and display the output
-        int[] test = new int[]{6, 6, 2, 6, 5, 2, 4, 1, 1, 3, 2, 0, 1, 0, 3, 4, 1, 3, 2, 4, 6, 6, 5, 4, 1, 0, 4, 3, 2, 1, 1, 2, 5, 1, 3, 6, 0, 4, 5, 5, 5, 5, 4, 0, 2, 6, 0, 3, 6, 0, 5, 3, 4, 2, 0, 3};
-        printSolutions(solver.solve(PipGrid.arrayToGrid(test)));
-//        printSolutions(solver.solve(getUserInput()));
+        int[] examplePipGrid1 = new int[]{
+                6, 6, 2, 6, 5, 2, 4, 1,
+                1, 3, 2, 0, 1, 0, 3, 4,
+                1, 3, 2, 4, 6, 6, 5, 4,
+                1, 0, 4, 3, 2, 1, 1, 2,
+                5, 1, 3, 6, 0, 4, 5, 5,
+                5, 5, 4, 0, 2, 6, 0, 3,
+                6, 0, 5, 3, 4, 2, 0, 3};
+        int[] examplePipGrid2 = new int[]{
+                4, 2, 5, 2, 6, 3, 5, 4,
+                5, 0, 4, 3, 1, 4, 1, 1,
+                1, 2, 3, 0, 2, 2, 2, 2,
+                1, 0, 4, 3, 2, 1, 1, 2,
+                4, 0, 6, 0, 3, 6, 6, 5,
+                4, 0, 1, 6, 4, 0, 3, 0,
+                6, 5, 3, 6, 2, 1, 5, 3};
+
+//        printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
+        printSolutions(solver.solve(getUserInput()));
     }
 
     private static PipGrid getUserInput(){
-        String inputString = getString("Provide the input to solve:");
+        // example1: 6,6,2,6,5,2,4,1,1,3,2,0,1,0,3,4,1,3,2,4,6,6,5,4,1,0,4,3,2,1,1,2,5,1,3,6,0,4,5,5,5,5,4,0,2,6,0,3,6,0,5,3,4,2,0,3
+        String inputString = getString("Provide the input to solve (comma separated, without spaces and in row-major order):");
         int[] inputInt = Arrays.stream(inputString.split(",")).mapToInt(Integer::parseInt).toArray();
-        return PipGrid.arrayToGrid(inputInt);
+
+        PipGrid input = null;
+        try {
+            input = PipGrid.arrayToGrid(inputInt);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Wrong number of pips in input: " + e);
+        }
+        return input;
     }
 
     /**
@@ -45,7 +69,7 @@ public class TUI {
         for (int i = 0; i < solutions.size(); i++) {
             printSolution(solutions.get(i));
         }
-        showMessage("[Finished] Do you want to be more awesome? Use the Haskell solver next time!"); // TODO types solutions
+        showMessage("[Finished] Do you want to be more awesome? Use the Haskell solver next time!");
     }
 
     private static void printSolution(BoneGrid boneGrid) {

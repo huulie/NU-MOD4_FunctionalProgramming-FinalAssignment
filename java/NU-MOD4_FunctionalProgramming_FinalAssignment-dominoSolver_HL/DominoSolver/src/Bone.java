@@ -33,6 +33,10 @@ public class Bone {
         return pipsRight;
     }
 
+    /**
+     * Checks if number of pip on both halves of the bone is symmetrical
+     * @return true if they are symmetrical, false if not
+     */
     public boolean isSymmetrical () {
         return this.getPipsLeft() == this.getPipsRight();
     }
