@@ -1,0 +1,200 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{multicol}
+\usepackage[UKenglish]{babel}
+\usepackage[utf8]{inputenc} %https://preview.overleaf.com/public/fkfwcnxwbsft/images/0cad1dd30b4ba7ed004d3a169bab980faaf3c018.jpeg
+\usepackage{amsmath}
+\usepackage{mathtools} %use \mathmbox as math alt. for mbox (unbreakable line)
+\usepackage{physics} %for using \dv{}{} to write a time derivative
+\usepackage{nicefrac} %provides \nicefrac{<Nr>}{<Dr>}, for Nr/Dr on one line
+\usepackage{wasysym} % add \male and \female symbols
+
+
+\usepackage[usenames,dvipsnames]{color} %tekstkleur aanpassen
+\usepackage[table]{xcolor} %tabel-kleuren
+\usepackage{soul} %strike out text using \st{}
+\usepackage{amsmath}
+%\usepackage{fixltx2e} only required for before 2015
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage[numbers, square, super]{natbib}
+\usepackage{bibentry}
+\usepackage{cite}
+\usepackage{textgreek}
+\usepackage[font={small}]{caption} % To make smaller captions below figure
+\usepackage[version=3]{mhchem} %chemical formulas, use \ce{XX}
+\usepackage[numbered]{mcode} %http://www.howtotex.com/tips-tricks/how-to-include-matlab-code-in-latex-documents/, use begin-end lstlisting or \lstinputlisting{/path_to_mfile/my_mfile.m} or \mcode{...}
+\usepackage{multirow} %row/column spanning http://en.wikibooks.org/wiki/LaTeX/Tables#Columns_spanning_multiple_rows
+\usepackage{enumitem} %change left margin of opsomming using [leftmargin=]
+\usepackage[nonumberlist]{glossaries} %use of glosseries (\gls), see https://en.wikibooks.org/wiki/LaTeX/Glossary
+%\makeglossaries
+\onehalfspacing
+
+\title{NU_MOD4-FP_Report}
+%\title{Optimization of the medication of a Parkinson patient using long-assesment of the tremor with a Pebble smartwatch}
+
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+\usepackage{geometry} % Required to change the page size to A4
+\geometry{a4paper} % Set the page size to be A4 as opposed to the default US Letter
+\geometry{margin=0.50in} %zijmarge aanpassen
+\usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
+\usepackage{placeins} %for the use of command FloatBarrier
+\usepackage{wrapfig} % Allows in-line images such as the example fish picture
+\linespread{1.2} %Line spacing (http://texblog.org/2011/09/30/quick-note-on-line-spacing/)
+%\setlength\parindent{0pt} % Uncomment to remove all indentation from paragraphs
+\graphicspath{{pictures/}} % Specifies the directory where pictures are stored
+\usepackage[nodayofweek]{datetime} %voor juiste datumweergave
+\usepackage{mdwlist} 
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[linktocpage=true, hidelinks]{hyperref} %http://texblog.org/2011/09/09/10-ways-to-customize-tocloflot/ and http://tex.stackexchange.com/questions/50747/options-for-appearance-of-links-in-hyperref
+\usepackage{tocloft} %add to TOC without page number: \cftaddtitleline{<ext>}{<kind>}{<text>}{<page>}
+\setlength{\cftsecnumwidth}{0.9cm} %fixing alignment of Roman Numerals
+\setlength{\cftsubsecnumwidth}{1.1cm} %fixing alignment of Roman Numerals (for subsections)
+\renewcommand{\cfttoctitlefont}{\hfil \Huge} % Centered title for ToC
+%\renewcommand{\contentsname}{\hfill\bfseries\huge Contents\hfill} 
+%\renewcommand{\cfttoctitlefont}{\centering\huge\bfseries\centering}
+%\renewcommand{\cftaftertoctitle}{\hfill}
+
+%diagrams (http://www.texample.net/tikz/examples/assignment-structure/)
+\usepackage{tikz} 
+\usepackage{verbatim}
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,%
+    decorations.pathreplacing,decorations.pathmorphing,shapes,%
+    matrix,shapes.symbols}
+\tikzset{
+>=stealth',
+  punktchain/.style={
+    rectangle, 
+    rounded corners, 
+    % fill=black!10,
+    draw=black, very thick,
+    text width=13em, 
+    minimum height=3em, 
+    text centered, 
+    on chain},
+  line/.style={draw, thick, <-},
+  element/.style={
+    tape,
+    top color=white,
+    bottom color=blue!50!black!60!,
+    minimum width=8em,
+    draw=blue!40!black!90, very thick,
+    text width=10em, 
+    minimum height=3.5em, 
+    text centered, 
+    on chain},
+  every join/.style={->, thick,shorten >=1pt},
+  decoration={brace},
+  tuborg/.style={decorate},
+  tubnode/.style={midway, right=2pt},
+}
+
+% voor het toevoegen van verborgen maar wel genummerde APPENDIX-secties
+% (http://stackoverflow.com/questions/3791950/remove-specific-subsection-from-toc-in-latex)
+\newcommand{\hiddensubsection}[1]{
+    \stepcounter{subsection}
+    \subsection*{\arabic{section}.\arabic{subsection}\hspace{1em}{#1}}
+}
+\newcommand{\hiddensubsubsection}[1]{
+    \stepcounter{subsubsection}
+    \subsection*{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}\hspace{1em}{#1}}
+}
+
+% Voor het inline kunnen plaatsen van comments
+% (http://latex-community.org/forum/viewtopic.php?f=44&t=8320)
+\newcommand{\ignore}[1]{}
+
+\begin{document}
+%--------------------------------------------------------------------------
+%	MAIN TEXT
+%\title{Title}
+%\maketitle
+\begin{center}
+{\bf \Large Nedap University - Module 4: the Critical Software Developer \\}
+{\bf \Large  Functional Programming: final assignment}\\
+\vspace{0.2cm}
+{\large{Author: Huub Lievestro}, \textit{Supervisor: Teun van Hemert}}\\
+\vspace{0.1cm}
+\today
+\end{center}
+
+\pagenumbering{arabic} %vanaf hier arabische nummering
+
+\section{Description of the algorithm}
+To solve the Domino problem, the following recursive algorithm was used: 
+\begin{enumerate}\setlength\itemsep{-1mm}
+    \item Go to the next empty place in the grid (at the start: go to origin of the grid)
+    \item Try to place a bone in four different orientations: horizontal (to the right) or vertical (to below),\newline and if a bone is not symmetrical: also try both orientations inverted.
+    \item Try each of these four positions for each of the available bones.
+    \item Check if the resulting bone placement is \textit{valid*}:
+    \begin{enumerate}\setlength\itemsep{-1mm}
+        \item If valid, place this bone on the grid and remove it from available bones.
+        \item Otherwise, stop recursion and discard this branch.
+    \end{enumerate}
+    \item Check number of available bones:
+    \begin{enumerate}\setlength\itemsep{-1mm}
+            \item If there is more than one bone still available, recursively start at step 1. 
+            \item If there is only one bone left: Check if this last bone is also valid:
+            \begin{enumerate}\setlength\itemsep{-1mm}
+            \item If so, then add the grid with placed bones to the list of solutions. 
+            \item Otherwise, stop recursion and discard this branch.
+            \end{enumerate}
+    \end{enumerate}
+    \item After all recursions are complete, return all found solutions (maybe zero, one or more)
+\end{enumerate}
+\vspace{5mm}
+\textit{*: A bone placement is valid if, and only if:}
+\begin{itemize}\setlength\itemsep{-1mm}
+    \item Both positions, where the bone is placed, are on the board (i.e. in bounds).
+    \item Both positions, where the bone is placed, are still empty (i.e. no bone is place there).
+    \item The number of pips in the input match the corresponding number of pips (left/right) on the bone.
+    \item The bone is still available for use (i.e. not already used yet).
+\end{itemize}
+\section{How to run my implementations}
+The follwing two subsections describe how to run my implementations of the algorithm above:
+\subsection{Haskell}
+\begin{enumerate}\setlength\itemsep{-1mm}
+    \item Download \href{https://github.com/huulie/NU-MOD4_FunctionalProgramming-FinalAssignment/blob/master/haskell/NU-MOD4_FunctionalProgramming_FinalAssignment-dominoSolver_HL.hs}{NU-MOD4\_FunctionalProgramming\_FinalAssignment-dominoSolver\_HL.hs}
+    \item Hard-code an input into the source code (examples provided)
+    \item Load this Haskell file into GHCi
+    \item Call the \mcode{solve} function, with the hardcoded input (name) as argument
+    \item If there are any solutions, they will be printed to the terminal
+\end{enumerate}
+\subsection{Java}
+\begin{enumerate}\setlength\itemsep{-1mm}
+    \item Download the \href{https://github.com/huulie/NU-MOD4_FunctionalProgramming-FinalAssignment/tree/master/java/NU-MOD4_FunctionalProgramming_FinalAssignment-dominoSolver_HL/DominoSolver/src}{DominoSolver\//src\/ directory (containing the Java source code)}
+    \item Compile and run this Java source code, using tools of your own preference
+    \item Type your input when prompted: comma separated, without spaces and in row-major order. Or, alternatively,  use one of the hard-coded examples.
+    \item The number of solutions and the solutions themselves will be printed to the terminal
+\end{enumerate}
+\textit{\textbf{Note: Java implementation is not fully functional, and may miss some of the valid solutions.}}
+
+\section{Comparison of both implementations}
+Haskell and Java are two very different languages to work with, both with their own (dis)advantages. Not only their syntax, vocabulary and structuring of programs is divergent, but also the way to think about problems is fundamentally different: in Haskell, you are telling what you want to do (declarative programming) versus decribing in Java how you want to do it (imperative programming). \newline 
+\\
+To me, Haskell feels like a more mathematical way of writing code. You describe what you are doing, one step at a time, telling Haskell how to map your input to the output. Except for the type system, it focuses more on what you are doing, without having to provides details about, for example, how things should be stored. This also creates challenges when trying to work with in-/output from outside the program: then you need to describe \textit{"how"} you want to handle this input, which doesn't feel natural in Haskell. The code is quite compact and relatively clutter-free, with the type definitions clearly separated from the actual functional code. However, it is all placed in one file, but this may be solved by using modules (not looked into this yet). I liked the easy and quick testing of functions via the GHCi interpreter. \newline
+\\
+Java feels more like modelling the real world, with classes like "Bone" representing concepts from this world. For me, this made me focus more on concrete concepts like a board and bones, instead of the more abstract function of placing a bone on a board. Because the user also lives in this real world, I find it easier to describe how this user should interact with my program. The Java code is more structured in classes and in multiple files, but this way of coding also makes the code more verbose, by introducing a lot of boilerplate code. Last, moving back from Haskell to Java, I found testing in Java to be less intuitive and light-weighted, because you need to have compiled your code first before you can run your tests. \newline
+\\
+To conclude, I think that both languages have their own application area: their own scope of problems they are more or less suited to solve. If you want to focus on abstract steps/functions on how to get from an input to an output, then probably use Haskell. But if you want to represent/model the state of "the real world" and the interactions between objects, then Java is most likely most suitable choice. And, above all, the two languages require a distinct way of thinking about problems, training your brain to have two different strategies to solve these challenges. 
+%\vspace{-3mm}
+
+%\clearpage
+\small
+\vspace{0.2cm}
+\section*{Source code}\vspace{-0.1cm}
+The source code is available on GitHub: \href{https://github.com/huulie/NU-MOD4_FunctionalProgramming-FinalAssignment}{huulie\//NU-MOD4\_FunctionalProgramming-FinalAssignment}
+
+%\vspace{0.5cm} 
+\section*{Acknowledgements}
+Thanks to Teun van Hemert, for his help with getting me to think declaratively, instead of imperatively. 
+
+ 
+\clearpage
+% Appendix  ---------------------------------------------------------------
+
+% % \section{APPENDIX1}
+% % \label{app:appendix1}
+
+%--einde bijlagen----------------------------------------------------------------
+\end{document}
