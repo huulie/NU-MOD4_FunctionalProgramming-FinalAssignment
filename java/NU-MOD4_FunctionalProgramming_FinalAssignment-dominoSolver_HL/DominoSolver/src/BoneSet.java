@@ -1,17 +1,20 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class BoneSet {
 
-   Bone[] bones;
+   List<Bone> bones;
 
     /**
      * Generates a Double Six bone set
      */
    public BoneSet() {
-       bones = new Bone[28];
+       bones = new ArrayList<Bone>();
 
        int n = 1;
        for (int l = 0; l < 7; l++) {
            for (int r = l ; r < 7; r++) {
-               bones[n-1] = new Bone(n, l, r);
+               bones.add(n-1, new Bone(n, l, r));
                        n++;
            }
        }
@@ -21,7 +24,14 @@ public class BoneSet {
      * Returns the Double Six bone set as array of bones
      * @return array of bones
      */
-   public Bone[] returnBones () {
+   public List<Bone> returnBones () {
        return bones;
    }
+
+   public static List<Bone> copyBoneList(List<Bone> original) {
+       List<Bone> copiedList = new ArrayList<Bone>();
+       copiedList.addAll(original);
+       return copiedList;
+   }
+
 }

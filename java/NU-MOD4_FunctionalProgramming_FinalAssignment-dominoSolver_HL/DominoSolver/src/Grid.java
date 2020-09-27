@@ -64,7 +64,7 @@ public class Grid {
        }
 
        public static Position next(Position position) { // TODO modifier
-           if (position.getX() == WIDTH && position.getY() == HEIGHT) {
+           if (position.getX() == WIDTH-1 && position.getY() == HEIGHT-1) {
                return new Position(0,0);
            } else {
                return index2position(position2index(position) + 1);

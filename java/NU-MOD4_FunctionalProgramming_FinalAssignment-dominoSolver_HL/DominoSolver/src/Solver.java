@@ -32,8 +32,10 @@ public class Solver {
     public List solve (PipGrid input) {
         this.input = input;
       BoneGrid currentBoard = new BoneGrid();
-      Bone[] availableBones = new BoneSet().returnBones();
+      List<Bone> availableBones = new BoneSet().returnBones();
 
+        Grid.Position startingPosition = new Grid.Position(-1,-1);
+      gotoNextPosition(startingPosition, currentBoard, availableBones);
     /* do something and solve it */
         // TODO how to now when ready
         return solutions ;
@@ -46,31 +48,31 @@ public class Solver {
      * @param availableBones
      * @return
      */
-    private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, Bone[] availableBones){
+    private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
         Grid.Position nextPostion = currentBoneGrid.nextEmpty(position);
 
         for (Bone bone : availableBones) {
-            allOrientations(currentBoneGrid.copy(), nextPostion, bone, availableBones.clone());
+            allOrientations(currentBoneGrid.copy(), nextPostion, bone, BoneSet.copyBoneList(availableBones));
             // TODO have to use new copies, instead of reference TODO copy/clone
         }
         // TODO returns?
     }
 
-    private void allOrientations(BoneGrid boneGrid, Grid.Position position, Bone bone, Bone[] availableBones){
+    private void allOrientations(BoneGrid boneGrid, Grid.Position position, Bone bone, List<Bone> availableBones){
         // always do horizontal and vertical
-        checkAndPlace(boneGrid, position, Grid.Position.horizontal(position), bone, availableBones );
-        checkAndPlace(boneGrid, position, Grid.Position.vertical(position), bone, availableBones );
+        checkAndPlace(boneGrid, position, position, Grid.Position.horizontal(position), bone, availableBones );
+        checkAndPlace(boneGrid,  position,position, Grid.Position.vertical(position), bone, availableBones );
 
         if (!bone.isSymmetrical()) {
             // do invHorizontal and invVertical
-            checkAndPlace(boneGrid, Grid.Position.horizontal(position), position, bone, availableBones );
-            checkAndPlace(boneGrid, Grid.Position.vertical(position), position, bone, availableBones );
+            checkAndPlace(boneGrid,  position,Grid.Position.horizontal(position), position, bone, availableBones );
+            checkAndPlace(boneGrid,  position,Grid.Position.vertical(position), position, bone, availableBones );
 
         }
     }
 
-    private void checkAndPlace(BoneGrid boneGrid, Grid.Position position1, Grid.Position position2, Bone bone, Bone[] availableBones){
-        if (availableBones.length == 1) {
+    private void checkAndPlace(BoneGrid boneGrid, Grid.Position currentPosition, Grid.Position position1, Grid.Position position2, Bone bone, List<Bone> availableBones){
+        if (availableBones.size() == 1) {
             if (valid(boneGrid,position1,position2,bone,availableBones)) {
                 // place bone
                 boneGrid.setBone(bone, position1);
@@ -86,9 +88,10 @@ public class Solver {
                 // place bone
                 boneGrid.setBone(bone, position1);
                 boneGrid.setBone(bone, position2);
+                availableBones.remove(bone);
 
                 // and gotoNextPosition
-                gotoNextPosition(position1 /* TODO */,boneGrid,availableBones);
+                gotoNextPosition(currentPosition /* TODO */,boneGrid,availableBones);
             } else {
                 // if invalid: do nothing because nonesense
             }
@@ -102,7 +105,7 @@ public class Solver {
 
     // Validation of placing bone on positions
     private boolean valid(BoneGrid boneGrid, Grid.Position position1, Grid.Position position2,
-                          Bone bone, Bone[] availableBones) {
+                          Bone bone, List<Bone> availableBones) {
         return validOnBoard(boneGrid, position1) && validOnBoard(boneGrid, position2) &&
                 validFree(boneGrid, position1) && validFree(boneGrid, position2) &&
                 validPipMatch(position1, position2, bone) && validNotUsed(bone, availableBones);
@@ -120,8 +123,8 @@ public class Solver {
         return input.getPip(position1) == bone.getPipsLeft() && input.getPip(position2) == bone.getPipsRight();
     }
 
-    private boolean validNotUsed (Bone bone, Bone[] availableBones) {
-        return Arrays.asList(availableBones).contains(bone);
+    private boolean validNotUsed (Bone bone, List<Bone> availableBones) {
+        return availableBones.contains(bone);
         // TODO: use a List or stream?
     }
 }
