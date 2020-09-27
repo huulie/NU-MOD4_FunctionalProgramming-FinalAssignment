@@ -10,7 +10,9 @@ public class TUI {
 
     public static void main(String[] args) {
         // ask user for input, give that input to the solver and display the output
-        printSolutions(solver.solve(getUserInput()));
+        int[] test = new int[]{6, 6, 2, 6, 5, 2, 4, 1, 1, 3, 2, 0, 1, 0, 3, 4, 1, 3, 2, 4, 6, 6, 5, 4, 1, 0, 4, 3, 2, 1, 1, 2, 5, 1, 3, 6, 0, 4, 5, 5, 5, 5, 4, 0, 2, 6, 0, 3, 6, 0, 5, 3, 4, 2, 0, 3};
+        printSolutions(solver.solve(PipGrid.arrayToGrid(test)));
+//        printSolutions(solver.solve(getUserInput()));
     }
 
     private static PipGrid getUserInput(){
@@ -38,7 +40,24 @@ public class TUI {
     }
 
     private static void printSolutions(List<BoneGrid> solutions) {
-        showMessage(".. print solutions here .."); // TODO types solutions
+        showMessage("There are " + solutions.size() + " solution(s) for the input:");
+
+        for (int i = 0; i < solutions.size(); i++) {
+            printSolution(solutions.get(i));
+        }
+        showMessage("[Finished] Do you want to be more awesome? Use the Haskell solver next time!"); // TODO types solutions
+    }
+
+    private static void printSolution(BoneGrid boneGrid) {
+        System.out.println(" ------------------------------------ ");
+        for (int y = 0; y < Grid.HEIGHT; y++) {
+            System.out.print(" | ");
+            for (int x = 0; x < Grid.WIDTH; x++) {
+                System.out.printf(" %02d ",boneGrid.getBone(new Grid.Position(x, y)).getNumber());
+            }
+            System.out.println(" | ");
+        }
+        System.out.println(" ------------------------------------ ");
     }
 
     /**
