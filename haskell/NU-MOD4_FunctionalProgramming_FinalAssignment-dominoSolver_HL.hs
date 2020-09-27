@@ -66,12 +66,14 @@ checkAndPlace p o bg pg b bs | length bs == 1 = if checkOrientation p o bg pg b 
 
 
 -- Running the solver program -- 
+    -- TO SOLVE YOUR DOMINO PROBLEM:
+    -- hardcode input in the source code
+    -- and use it as input to the "solve" function
+
 -- Ask for input:
 dominoSolver :: IO ()
-dominoSolver = do putStrLn "Type an input (linear notation, row-major order): "
-                  input <- getLine -- need to parse the input
-                  putStrLn "Solving the problem..."
-                  --  solve input
+dominoSolver = do putStrLn "Here you should be able to type an input (linear notation, row-major order): "
+                  putStrLn "However, there is no user interface implemented :("
 
 -- or use one of the example PipGrids:
 examplePipGrid1 :: PipGrid -- has 4 solutions
@@ -145,19 +147,4 @@ changeDualPositions bg (p1,p2) ((_,_), bn) = replacePosition p2 bn (replacePosit
     where replacePosition p bn bg  = take (position2index p) bg ++ [bn] ++ drop (position2index p +1) bg
 
 -- for IO things:
--- -- parseUserInput:: String -> [String]
--- parseUserInput i = splitOn "," i
--- -- parseUserInput = ...
-
--- line with n items from list xs
--- printListLine :: Int -> [a] -> IO ()
--- printListLine _ [] = []
--- printListLine n xs = splitAt n xs
---     where printLine (l, n) = putStrLn l printListLine n 
-
-
--- n < 10 = "0" + n
--- otherwise = n
--- printGrid :: Grid -> IO () -- NEEDS WORK
--- printGrid ns = putStr [n ,n <- ns] 
---     where printRowHorz g y = [g!!i | x <-[0..WIDTH] ] ++ ['/n]
+-- IO user interface not implemented
