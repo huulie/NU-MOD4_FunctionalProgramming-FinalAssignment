@@ -1,26 +1,30 @@
 package domino;
 
-public class Grid {
+public class Grid<T> {
 
      public final static int WIDTH = 8;
      public final static int HEIGHT = 7;
 
-    private Object[][] elements;
+     private final T[][] elements;
 
-   public boolean isOnBoard (Position position) {
+    public Grid(T[][] emptyGrid) { // TODO modifier: Teun protected, here public because in other package
+        this.elements = emptyGrid;
+    }
+
+    public boolean isOnBoard (Position position) {
        return position.getX() >= 0 && position.getX() < this.WIDTH && position.getY() >= 0 && position.getY() < this.HEIGHT;
    }
 
    public boolean isFree(Position position) {
-       return this.getElement(position) == null;
+       return this.getElementAt(position) == null;
    }
 
-   private Object getElement (Position position) {
-       return elements[position.getX()][position.getY()];
+   public T getElementAt(Position position) {
+       return this.elements[position.getX()][position.getY()];
    }
 
-   private void setElement (Object element, Position position) {
-       elements[position.getX()][position.getY()] = element;
+   public void setElementAt(T element, Position position) {
+       this.elements[position.getX()][position.getY()] = element;
    }
 
    public static class Position {
@@ -89,4 +93,9 @@ public class Grid {
            return new Position(position.getX(), position.getY()+1);
        }
    }
+
+    public Grid copy() {
+       // TODO implement
+        return this;
+    }
 }

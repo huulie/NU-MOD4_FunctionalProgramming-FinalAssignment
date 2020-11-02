@@ -2,29 +2,32 @@ package solver;
 
 import domino.Grid;
 
-public class PipGrid extends Grid {
+public class PipGrid extends Grid<Integer> {
 
     /**
      * board.Grid with number of pips (input for the solver)
      */
-    private int[][] pips;
+    private int[][] elements;
 
     PipGrid () {
-        pips = new int[WIDTH][HEIGHT];
+        super(new Integer[WIDTH][HEIGHT]);
     }
 
-    private void setPip(Position position, int pip) {
-        pips[position.getX()][position.getY()] = pip;
+    @Override
+    public Integer getElementAt(Position position) {
+        return super.getElementAt(position);
     }
 
-    public int getPip (Position position) {
-        return pips[position.getX()][position.getY()];
+    @Override
+    public void setElementAt(Integer pip, Position position) {
+        super.setElementAt(pip, position);
     }
 
-    public static PipGrid arrayToGrid(int[] array1D) {
+    // TODO move to superclass Grid?!
+    public static PipGrid arrayToGrid(Integer[] array1D) {
         PipGrid pipGrid = new PipGrid();
-        for(int i = 0; i < HEIGHT*WIDTH; i++) {
-            pipGrid.setPip(Grid.Position.index2position(i),array1D[i]);
+        for(Integer i = 0; i < HEIGHT*WIDTH; i++) {
+            pipGrid.setElementAt(array1D[i],Grid.Position.index2position(i));
         }
 
         return pipGrid;

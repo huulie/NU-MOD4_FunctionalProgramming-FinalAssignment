@@ -17,7 +17,7 @@ public class TUI {
 
     public static void main(String[] args) {
         // ask user for input, give that input to the solver and display the output
-        int[] examplePipGrid1 = new int[]{
+        Integer[] examplePipGrid1 = new Integer[]{
                 6, 6, 2, 6, 5, 2, 4, 1,
                 1, 3, 2, 0, 1, 0, 3, 4,
                 1, 3, 2, 4, 6, 6, 5, 4,
@@ -25,7 +25,7 @@ public class TUI {
                 5, 1, 3, 6, 0, 4, 5, 5,
                 5, 5, 4, 0, 2, 6, 0, 3,
                 6, 0, 5, 3, 4, 2, 0, 3};
-        int[] examplePipGrid2 = new int[]{
+        Integer[] examplePipGrid2 = new Integer[]{
                 4, 2, 5, 2, 6, 3, 5, 4,
                 5, 0, 4, 3, 1, 4, 1, 1,
                 1, 2, 3, 0, 2, 2, 2, 2,
@@ -43,7 +43,7 @@ public class TUI {
     private static PipGrid getUserInput(){
         // example1: 6,6,2,6,5,2,4,1,1,3,2,0,1,0,3,4,1,3,2,4,6,6,5,4,1,0,4,3,2,1,1,2,5,1,3,6,0,4,5,5,5,5,4,0,2,6,0,3,6,0,5,3,4,2,0,3
         String inputString = getString("Provide the input to solve (comma separated, without spaces and in row-major order):");
-        int[] inputInt = Arrays.stream(inputString.split(",")).mapToInt(Integer::parseInt).toArray();
+        Integer[] inputInt = Arrays.stream(inputString.split(",")).mapToInt(Integer::parseInt).boxed().toArray(Integer[]::new);
 
         PipGrid input = null;
         try {
@@ -86,7 +86,7 @@ public class TUI {
         for (int y = 0; y < Grid.HEIGHT; y++) {
             System.out.print(" | ");
             for (int x = 0; x < Grid.WIDTH; x++) {
-                System.out.printf(" %02d ",boneGrid.getBone(new Grid.Position(x, y)).getNumber());
+                System.out.printf(" %02d ",boneGrid.getElementAt(new Grid.Position(x, y)).getNumber());
             }
             System.out.println(" | ");
         }

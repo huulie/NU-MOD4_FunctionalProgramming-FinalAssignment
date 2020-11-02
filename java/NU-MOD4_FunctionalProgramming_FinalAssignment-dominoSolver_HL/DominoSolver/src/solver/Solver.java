@@ -75,8 +75,8 @@ public class Solver {
         if (availableBones.size() == 1) { // then stop recursing, and check if it is a valid solution
             if (valid(boneGrid,position1,position2,bone,availableBones)) {
                 // place bone
-                boneGrid.setBone(bone, position1);
-                boneGrid.setBone(bone, position2);
+                boneGrid.setElementAt(bone, position1);
+                boneGrid.setElementAt(bone, position2);
                 // and add resulting solver.BoneGrid to List
                 this.solutions.add(boneGrid);
             } else {
@@ -85,8 +85,8 @@ public class Solver {
         } else {
             if (valid(boneGrid,position1,position2,bone,availableBones)) {
                 // place bone
-                boneGrid.setBone(bone, position1);
-                boneGrid.setBone(bone, position2);
+                boneGrid.setElementAt(bone, position1);
+                boneGrid.setElementAt(bone, position2);
                 availableBones.remove(bone);
                 // and gotoNextPosition
                 gotoNextPosition(currentPosition, boneGrid, availableBones);
@@ -113,7 +113,7 @@ public class Solver {
     }
 
     private boolean validPipMatch (Grid.Position position1, Grid.Position position2, Bone bone) {
-        return input.getPip(position1) == bone.getPipsLeft() && input.getPip(position2) == bone.getPipsRight();
+        return input.getElementAt(position1) == bone.getPipsLeft() && input.getElementAt(position2) == bone.getPipsRight();
     }
 
     private boolean validNotUsed (Bone bone, List<Bone> availableBones) {
