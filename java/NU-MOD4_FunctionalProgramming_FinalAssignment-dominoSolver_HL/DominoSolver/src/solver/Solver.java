@@ -49,14 +49,14 @@ public class Solver {
     /**
      * Move solver to next position
      * @param position to start from
-     * @param currentBoneGrid current state of the solver.BoneGrid
+     * @param currentBoneGrid current state of the domino.BoneGrid
      * @param availableBones current list of available bones
      */
     private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
         Grid.Position nextPostion = currentBoneGrid.nextEmptyPosition(position);
 
         for (Bone bone : availableBones) {
-            allOrientations(currentBoneGrid.copy(), nextPostion, bone, BoneSet.copyBoneList(availableBones));
+            allOrientations(currentBoneGrid.deepCopy(), nextPostion, bone, BoneSet.copyBoneList(availableBones));
         }
     }
 
@@ -77,7 +77,7 @@ public class Solver {
                 // place bone
                 boneGrid.setElementAt(bone, position1);
                 boneGrid.setElementAt(bone, position2);
-                // and add resulting solver.BoneGrid to List
+                // and add resulting domino.BoneGrid to List
                 this.solutions.add(boneGrid);
             } else {
                 // do nothing because nonsense

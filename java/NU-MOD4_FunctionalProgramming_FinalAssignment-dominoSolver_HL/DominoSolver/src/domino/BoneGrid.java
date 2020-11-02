@@ -1,7 +1,4 @@
-package solver;
-
-import domino.Bone;
-import domino.Grid;
+package domino;
 
 /**
  * board.Grid with placed bones (output of the solver)
@@ -22,29 +19,13 @@ public class BoneGrid extends Grid<Bone> {
         super.setElementAt(bone, position);
     }
 
-
-    // TODO move to superclass Grid?!
-    public Position nextEmptyPosition(Position position) {
-        if(position.getX() == -1 && position.getY() == -1) {
-            return new Position(0,0); // starting position
-        }
-
-        Position currentPosition = position;
-
-        while (this.getElementAt(currentPosition) != null) {
-            currentPosition = Position.next(currentPosition);
-            if(!isOnBoard(currentPosition)) {
-                return null; // should never happen, because next starts at origin again
-            }
-        }
-        return currentPosition;
-    }
-
-    @Override
-    public BoneGrid copy() {
+    /**
+     * Creates a new BoneGrid, identical to the original BoneGrid.
+     * @return a copy of this BoneGrid
+     */
+    public BoneGrid deepCopy() {
         BoneGrid copiedGrid = new BoneGrid();
 
-        // TODO: move this to superclass?!
         for (int i = 0; i < HEIGHT*WIDTH; i++) {
             if (this.getElementAt(Position.index2position(i)) != null) { // if null, keep null
                 copiedGrid.setElementAt(this.getElementAt(Position.index2position(i)), Position.index2position(i));

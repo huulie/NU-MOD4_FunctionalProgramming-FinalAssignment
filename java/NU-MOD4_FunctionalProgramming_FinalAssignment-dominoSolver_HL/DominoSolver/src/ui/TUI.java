@@ -1,8 +1,8 @@
 package ui;
 
-import solver.BoneGrid;
+import domino.BoneGrid;
 import domino.Grid;
-import solver.PipGrid;
+import domino.PipGrid;
 import solver.Solver;
 
 import java.io.BufferedReader;
@@ -35,7 +35,7 @@ public class TUI {
                 6, 5, 3, 6, 2, 1, 5, 3};
 
         printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
-//        printSolutions(solver.solve(solver.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
+//        printSolutions(solver.solve(domino.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
 
 //        printSolutions(solver.solve(getUserInput()));
     }
