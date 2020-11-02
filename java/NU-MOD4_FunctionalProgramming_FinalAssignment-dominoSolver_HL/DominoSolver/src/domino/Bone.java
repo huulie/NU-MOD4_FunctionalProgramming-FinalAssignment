@@ -5,17 +5,17 @@ public class Bone {
     /**
      * Number of the bone
      */
-    private int number;
+    private final int number;
 
     /**
      * Number of pips on the left side
      */
-    private int pipsLeft;
+    private final int pipsLeft;
 
     /**
      * Number of pips on the right side
      */
-    private int pipsRight;
+    private final int pipsRight;
 
     public Bone (int number, int pipsLeft, int pipsRight) {
         this.number = number;

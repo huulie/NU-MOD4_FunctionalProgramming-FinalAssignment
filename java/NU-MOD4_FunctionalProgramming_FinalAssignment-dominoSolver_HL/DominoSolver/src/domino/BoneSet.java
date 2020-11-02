@@ -5,14 +5,14 @@ import java.util.List;
 
 public class BoneSet {
 
-   private List<Bone> bones;
+   private final List<Bone> bones;
 
     /**
      * Generates a Double Six bone set
      * (could be generalised to generate other variants, but YAGNI for now)
      */
    public BoneSet() {
-       bones = new ArrayList<Bone>();
+       bones = new ArrayList<>();
 
        int n = 1;
        for (int l = 0; l < 7; l++) {
@@ -33,7 +33,6 @@ public class BoneSet {
      * @return a copy of the original
      */
    public static List<Bone> copyBoneList(List<Bone> original) {
-       List<Bone> copiedList = new ArrayList<Bone>(original);
-       return copiedList;
+       return new ArrayList<>(original);
    }
 }

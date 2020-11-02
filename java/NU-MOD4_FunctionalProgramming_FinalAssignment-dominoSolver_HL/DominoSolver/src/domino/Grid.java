@@ -12,7 +12,7 @@ public class Grid<T> {
     }
 
     public boolean isOnBoard (Position position) {
-        return position.getX() >= 0 && position.getX() < this.WIDTH && position.getY() >= 0 && position.getY() < this.HEIGHT;
+        return position.getX() >= 0 && position.getX() < WIDTH && position.getY() >= 0 && position.getY() < HEIGHT;
     }
 
     public boolean isFree(Position position) {

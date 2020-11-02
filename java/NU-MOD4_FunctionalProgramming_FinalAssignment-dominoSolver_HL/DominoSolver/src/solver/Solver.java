@@ -18,13 +18,13 @@ public class Solver {
     /**
      * List of found solutions
      */
-    private List<BoneGrid> solutions;
+    private final List<BoneGrid> solutions;
 
     /**
      * Creates a new solver, to solve at least one of your problems
      */
     public Solver() {
-        this.solutions = new ArrayList<BoneGrid>();
+        this.solutions = new ArrayList<>();
     }
 
     /**
@@ -79,9 +79,7 @@ public class Solver {
                 boneGrid.setElementAt(bone, position2);
                 // and add resulting domino.BoneGrid to List
                 this.solutions.add(boneGrid);
-            } else {
-                // do nothing because nonsense
-            }
+            } // else: do nothing because nonsense
         } else {
             if (valid(boneGrid,position1,position2,bone,availableBones)) {
                 // place bone
@@ -90,9 +88,7 @@ public class Solver {
                 availableBones.remove(bone);
                 // and gotoNextPosition
                 gotoNextPosition(currentPosition, boneGrid, availableBones);
-            } else {
-                // do nothing because nonsense
-            }
+            } // else: do nothing because nonsense
         }
     }
 
