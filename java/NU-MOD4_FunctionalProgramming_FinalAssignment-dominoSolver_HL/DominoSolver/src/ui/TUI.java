@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TUI {
 
-    private static Solver solver = new Solver();
+    private final static Solver solver = new Solver();
 
     public static void main(String[] args) {
         // ask user for input, give that input to the solver and display the output
@@ -34,15 +34,14 @@ public class TUI {
                 4, 0, 1, 6, 4, 0, 3, 0,
                 6, 5, 3, 6, 2, 1, 5, 3};
 
-        printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
+//        printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
 //        printSolutions(solver.solve(domino.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
-
-//        printSolutions(solver.solve(getUserInput()));
+        printSolutions(solver.solve(getUserInput())); // or enable this to solve user input
     }
 
     private static PipGrid getUserInput(){
-        // example1: 6,6,2,6,5,2,4,1,1,3,2,0,1,0,3,4,1,3,2,4,6,6,5,4,1,0,4,3,2,1,1,2,5,1,3,6,0,4,5,5,5,5,4,0,2,6,0,3,6,0,5,3,4,2,0,3
         String inputString = getString("Provide the input to solve (comma separated, without spaces and in row-major order):");
+        inputString = inputString.replaceAll("\\s",""); // to be sure: remove whitespace (in case somebody didn't read properly)
         Integer[] inputInt = Arrays.stream(inputString.split(",")).mapToInt(Integer::parseInt).boxed().toArray(Integer[]::new);
 
         PipGrid input = null;
@@ -56,29 +55,29 @@ public class TUI {
 
     /**
      * Prints the question and asks the user to input a String.
-     *
+     * [Note: input not sanitized]
      * @param question the question shown to the user, asking for input
      * @return The user input as a String
      */
-    public static String getString(String question) {
-        showMessage(question); // manual new line, for better layout (no extra white lines)
-        String antw = null;
+    private static String getString(String question) {
+        System.out.println(question);
+        String answer = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            antw = in.readLine();
+            answer = in.readLine();
         } catch (IOException e) {
-            showMessage("IO exception: " + e.getLocalizedMessage());
+            System.err.println("IO exception: " + e.getLocalizedMessage());
         }
-        return (antw == null) ? "" : antw;
+        return (answer == null) ? "" : answer;
     }
 
     private static void printSolutions(List<BoneGrid> solutions) {
-        showMessage("There are " + solutions.size() + " solution(s) for the input:");
+        System.out.println("There are " + solutions.size() + " solution(s) for the input:");
 
-        for (int i = 0; i < solutions.size(); i++) {
-            printSolution(solutions.get(i));
+        for (BoneGrid solution : solutions) {
+            printSolution(solution);
         }
-        showMessage("[Finished] Do you want to be more awesome? Use the Haskell solver next time!");
+        System.out.println("[Finished] ## Do you want to be more awesome? Use the Haskell solver next time!");
     }
 
     private static void printSolution(BoneGrid boneGrid) {
@@ -91,14 +90,5 @@ public class TUI {
             System.out.println(" | ");
         }
         System.out.println(" ------------------------------------ ");
-    }
-
-    /**
-     * Writes the given message to system output.
-     *
-     * @param message the message to write to the system output.
-     */
-    public static void showMessage(String message) {
-        System.out.println(message);
     }
 }
