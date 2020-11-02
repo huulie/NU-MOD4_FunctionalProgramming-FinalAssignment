@@ -1,9 +1,9 @@
-package board;
+package domino;
 
 public class Grid {
 
-     public final static int WIDTH = 8; // TODO modifier
-     public final static int HEIGHT = 7; // TODO modifier
+     public final static int WIDTH = 8;
+     public final static int HEIGHT = 7;
 
     private Object[][] elements;
 

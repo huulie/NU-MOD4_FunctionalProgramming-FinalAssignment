@@ -1,4 +1,4 @@
-package board;
+package domino;
 
 import java.util.ArrayList;
 import java.util.List;

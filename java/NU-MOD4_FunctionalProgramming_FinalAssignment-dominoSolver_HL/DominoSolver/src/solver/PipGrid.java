@@ -1,4 +1,6 @@
-package board;
+package solver;
+
+import domino.Grid;
 
 public class PipGrid extends Grid {
 

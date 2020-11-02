@@ -1,6 +1,6 @@
 package solver;
 
-import board.*;
+import domino.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class Solver {
     /**
      * Move solver to next position
      * @param position to start from
-     * @param currentBoneGrid current state of the board.BoneGrid
+     * @param currentBoneGrid current state of the solver.BoneGrid
      * @param availableBones current list of available bones
      */
     private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
@@ -77,7 +77,7 @@ public class Solver {
                 // place bone
                 boneGrid.setBone(bone, position1);
                 boneGrid.setBone(bone, position2);
-                // and add resulting board.BoneGrid to List
+                // and add resulting solver.BoneGrid to List
                 this.solutions.add(boneGrid);
             } else {
                 // do nothing because nonsense

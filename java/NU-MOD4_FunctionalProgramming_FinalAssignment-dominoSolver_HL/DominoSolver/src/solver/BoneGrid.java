@@ -1,4 +1,7 @@
-package board;
+package solver;
+
+import domino.Bone;
+import domino.Grid;
 
 public class BoneGrid extends Grid {
 

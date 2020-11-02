@@ -1,8 +1,8 @@
 package ui;
 
-import board.BoneGrid;
-import board.Grid;
-import board.PipGrid;
+import solver.BoneGrid;
+import domino.Grid;
+import solver.PipGrid;
 import solver.Solver;
 
 import java.io.BufferedReader;
@@ -34,10 +34,10 @@ public class TUI {
                 4, 0, 1, 6, 4, 0, 3, 0,
                 6, 5, 3, 6, 2, 1, 5, 3};
 
-//        printSolutions(solver.solve(board.PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
-//        printSolutions(solver.solve(board.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
+        printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
+//        printSolutions(solver.solve(solver.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
 
-        printSolutions(solver.solve(getUserInput()));
+//        printSolutions(solver.solve(getUserInput()));
     }
 
     private static PipGrid getUserInput(){
