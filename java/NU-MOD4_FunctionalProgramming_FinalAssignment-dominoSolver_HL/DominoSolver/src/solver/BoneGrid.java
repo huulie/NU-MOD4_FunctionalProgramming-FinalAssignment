@@ -24,7 +24,7 @@ public class BoneGrid extends Grid<Bone> {
 
 
     // TODO move to superclass Grid?!
-    public Position nextEmpty(Position position) {
+    public Position nextEmptyPosition(Position position) {
         if(position.getX() == -1 && position.getY() == -1) {
             return new Position(0,0); // starting position
         }

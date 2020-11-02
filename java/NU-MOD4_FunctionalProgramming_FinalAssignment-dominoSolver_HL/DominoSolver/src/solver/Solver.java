@@ -53,7 +53,7 @@ public class Solver {
      * @param availableBones current list of available bones
      */
     private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
-        Grid.Position nextPostion = currentBoneGrid.nextEmpty(position);
+        Grid.Position nextPostion = currentBoneGrid.nextEmptyPosition(position);
 
         for (Bone bone : availableBones) {
             allOrientations(currentBoneGrid.copy(), nextPostion, bone, BoneSet.copyBoneList(availableBones));
