@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * solver.Solver of the Domino problem
+ * Solver of the Domino problem
  */
 public class Solver {
 
@@ -18,7 +18,7 @@ public class Solver {
     /**
      * List of found solutions
      */
-    List solutions;
+    private List<BoneGrid> solutions;
 
     /**
      * Creates a new solver, to solve at least one of your problems
@@ -32,7 +32,7 @@ public class Solver {
      * @param input to solve
      * @return List of found solutions
      */
-    public List solve (PipGrid input) {
+    public List<BoneGrid> solve (PipGrid input) {
         // set the inputs
         this.input = input;
         BoneGrid currentBoard = new BoneGrid();
@@ -53,25 +53,25 @@ public class Solver {
      * @param availableBones current list of available bones
      */
     private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
-        Grid.Position nextPostion = currentBoneGrid.nextEmptyPosition(position);
+        Grid.Position nextPosition = currentBoneGrid.nextEmptyPosition(position);
 
         for (Bone bone : availableBones) {
-            allOrientations(currentBoneGrid.deepCopy(), nextPostion, bone, BoneSet.copyBoneList(availableBones));
+            tryAllOrientations(currentBoneGrid.deepCopy(), nextPosition, bone, BoneSet.copyBoneList(availableBones));
         }
     }
 
-    private void allOrientations(BoneGrid boneGrid, Grid.Position position, Bone bone, List<Bone> availableBones){
+    private void tryAllOrientations(BoneGrid boneGrid, Grid.Position position, Bone bone, List<Bone> availableBones){
         // always do horizontal and vertical
-        checkAndPlace(boneGrid,  position, position, Grid.Position.horizontal(position), bone, availableBones );
-        checkAndPlace(boneGrid,  position, position, Grid.Position.vertical(position), bone, availableBones );
+        checkAndPlaceBone(boneGrid,  position, position, Grid.Position.horizontal(position), bone, availableBones );
+        checkAndPlaceBone(boneGrid,  position, position, Grid.Position.vertical(position), bone, availableBones );
 
         if (!bone.isSymmetrical()) { // also do invHorizontal and invVertical
-            checkAndPlace(boneGrid,  position, Grid.Position.horizontal(position), position, bone, availableBones );
-            checkAndPlace(boneGrid,  position, Grid.Position.vertical(position), position, bone, availableBones );
+            checkAndPlaceBone(boneGrid,  position, Grid.Position.horizontal(position), position, bone, availableBones );
+            checkAndPlaceBone(boneGrid,  position, Grid.Position.vertical(position), position, bone, availableBones );
         }
     }
 
-    private void checkAndPlace(BoneGrid boneGrid, Grid.Position currentPosition, Grid.Position position1, Grid.Position position2, Bone bone, List<Bone> availableBones){
+    private void checkAndPlaceBone(BoneGrid boneGrid, Grid.Position currentPosition, Grid.Position position1, Grid.Position position2, Bone bone, List<Bone> availableBones){
         if (availableBones.size() == 1) { // then stop recursing, and check if it is a valid solution
             if (valid(boneGrid,position1,position2,bone,availableBones)) {
                 // place bone
@@ -96,7 +96,7 @@ public class Solver {
         }
     }
 
-    // Validation of placing bone on positions (first = left of bone, and second = right of bone)
+    // Validation of placing bone on positions (first position = left of bone, and second position = right of bone)
     private boolean valid(BoneGrid boneGrid, Grid.Position position1, Grid.Position position2,
                           Bone bone, List<Bone> availableBones) {
         return validOnBoard(boneGrid, position1) && validOnBoard(boneGrid, position2) &&
