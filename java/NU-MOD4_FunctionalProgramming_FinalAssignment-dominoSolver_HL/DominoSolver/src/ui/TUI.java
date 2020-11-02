@@ -1,3 +1,10 @@
+package ui;
+
+import board.BoneGrid;
+import board.Grid;
+import board.PipGrid;
+import solver.Solver;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,12 +29,14 @@ public class TUI {
                 4, 2, 5, 2, 6, 3, 5, 4,
                 5, 0, 4, 3, 1, 4, 1, 1,
                 1, 2, 3, 0, 2, 2, 2, 2,
-                1, 0, 4, 3, 2, 1, 1, 2,
+                1, 4, 0, 1, 3, 5, 6, 5,
                 4, 0, 6, 0, 3, 6, 6, 5,
                 4, 0, 1, 6, 4, 0, 3, 0,
                 6, 5, 3, 6, 2, 1, 5, 3};
 
-//        printSolutions(solver.solve(PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
+//        printSolutions(solver.solve(board.PipGrid.arrayToGrid(examplePipGrid1))); // Can be used to test with examples
+//        printSolutions(solver.solve(board.PipGrid.arrayToGrid(examplePipGrid2))); // Can be used to test with examples
+
         printSolutions(solver.solve(getUserInput()));
     }
 

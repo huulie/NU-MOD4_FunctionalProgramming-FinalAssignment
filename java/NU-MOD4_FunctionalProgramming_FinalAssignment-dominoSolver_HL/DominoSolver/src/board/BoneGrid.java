@@ -1,12 +1,14 @@
+package board;
+
 public class BoneGrid extends Grid {
 
     /**
-     * Grid with numbers of placed bones (output of the solver)
+     * board.Grid with numbers of placed bones (output of the solver)
      */
     private Bone[][] bones;
 
 
-    BoneGrid () {
+    public BoneGrid () { // TODO check modifier
         bones = new Bone[WIDTH][HEIGHT];
     }
 

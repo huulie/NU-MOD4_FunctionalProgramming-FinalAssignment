@@ -1,13 +1,17 @@
+package solver;
+
+import board.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Solver of the Domino problem
+ * solver.Solver of the Domino problem
  */
 public class Solver {
 
     /**
-     * Grid of pips, input to solver
+     * board.Grid of pips, input to solver
      */
     private PipGrid input;
 
@@ -45,7 +49,7 @@ public class Solver {
     /**
      * Move solver to next position
      * @param position to start from
-     * @param currentBoneGrid current state of the BoneGrid
+     * @param currentBoneGrid current state of the board.BoneGrid
      * @param availableBones current list of available bones
      */
     private void gotoNextPosition(Grid.Position position, BoneGrid currentBoneGrid, List<Bone> availableBones){
@@ -73,7 +77,7 @@ public class Solver {
                 // place bone
                 boneGrid.setBone(bone, position1);
                 boneGrid.setBone(bone, position2);
-                // and add resulting BoneGrid to List
+                // and add resulting board.BoneGrid to List
                 this.solutions.add(boneGrid);
             } else {
                 // do nothing because nonsense

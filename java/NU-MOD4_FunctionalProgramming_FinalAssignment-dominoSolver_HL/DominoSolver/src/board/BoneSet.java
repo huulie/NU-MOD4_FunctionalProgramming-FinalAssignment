@@ -1,3 +1,5 @@
+package board;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class BoneSet {
    }
 
     /**
-     * Creates a new List of Bones, identical to the original Bone List.
+     * Creates a new List of Bones, identical to the original board.Bone List.
      * @param original to copy
      * @return a copy of the original
      */
